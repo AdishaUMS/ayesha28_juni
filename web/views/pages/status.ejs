@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') %>
+    <%- include('../scripts/onload_torque.ejs') %>
+    <%- include('../scripts/status_update.ejs') %>
+    <%- include('../scripts/status_toggle_torque.ejs') %>
+    <%- include('../scripts/status_apply_torque.ejs') %>
+</head>
+
+<body class="bg-slate-900" onload="onload_torque()">
+    <%- include('../partials/navbar') %>
+    <div class="flex flex-row">
+        <%- include('../partials/status_joint_table') %>
+        <%- include('../partials/status_action_button') %>
+    </div>
+</body>
+
+</html>

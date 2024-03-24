@@ -1,0 +1,14 @@
+<script>
+    function status_enable_all_torque() {
+        <% for(let i = 0; i < joint_info.joint_num; i++) { %> 
+            document.getElementById('torque_en_<%= joint_info.joint_id[i] %>').checked = true    
+        <% } %>
+    }
+
+    
+    function status_disable_all_torque() {
+        <% for(let i = 0; i < joint_info.joint_num; i++) { %> 
+            document.getElementById('torque_en_<%= joint_info.joint_id[i] %>').checked = false
+        <% } %>
+    }
+</script>

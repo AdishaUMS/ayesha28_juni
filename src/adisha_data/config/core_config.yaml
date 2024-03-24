@@ -1,0 +1,6 @@
+adisha_controllers_path: /adisha-os/src/adisha_controllers
+adisha_data_path: /adisha-os/src/adisha_data
+adisha_interfaces_path: /adisha-os/src/adisha_interfaces
+adisha_main_path: /adisha-os/src/adisha_main
+adisha_tests_path: /adisha-os/src/adisha_tests
+os_path: /adisha-os

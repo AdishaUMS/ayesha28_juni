@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') %>
+    <%- include('../scripts/onload_torque.ejs') %>
+    <%- include('../scripts/pose_studio_update') %>
+    <%- include('../scripts/pose_studio_toggle_torque') %>
+    <%- include('../scripts/pose_studio_apply_torque') %>
+    <%- include('../scripts/pose_studio_save_pose') %>
+    <%- include('../scripts/pose_studio_popup') %>
+</head>
+
+<body class="bg-slate-900" onload="onload_torque()">
+    <%- include('../partials/navbar') %>
+    <div class="flex flex-row">
+        <%- include('../partials/pose_studio_table') %>
+        <%- include('../partials/pose_studio_button') %>
+        <%- include('../partials/pose_studio_pose_select') %>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+services:
+  altair-os:
+    image: adisha-os
+    container_name: adisha-os
+    # devices:
+    #   - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - ./src:/adisha-os/src
+      - ./web:/adisha-os/web
+    ports:
+      - "3000:3000"

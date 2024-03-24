@@ -1,0 +1,10 @@
+<nav class="bg-gray-800 font-inter text-white flex items-center justify-between">
+    <div class="flex items-center ml-16">
+        <a class="text-lg px-6 py-2 rounded-full hover:bg-gray-700 hover:text-cyan-300" href="/<%= robot_info.robot_id %>">Status</a>
+        <a class="text-lg px-6 py-2 rounded-full hover:bg-gray-700 hover:text-cyan-300" href="/<%= robot_info.robot_id %>/posestudio">Pose Studio</a>
+        <a class="text-lg px-6 py-2 rounded-full hover:bg-gray-700 hover:text-cyan-300" href="/<%= robot_info.robot_id %>/motionsequencer">Motion Sequencer</a>
+        <a class="text-lg px-6 py-2 rounded-full hover:bg-gray-700 hover:text-cyan-300" href="/<%= robot_info.robot_id %>/tune">Tune</a>
+        <a class="text-lg px-6 py-2 rounded-full hover:bg-gray-700 hover:text-cyan-300" href="/<%= robot_info.robot_id %>/play">Play</a>
+    </div>
+    <a class="text-2xl font-semibold px-8 py-2 mr-16 my-4 rounded-full hover:bg-gray-700 hover:text-cyan-300" href="https://github.com/AdishaUMS" target="_blank">Adisha App | <%= robot_info.robot_id %> (<%= robot_info.robot_ip %>)</a>
+</nav>
