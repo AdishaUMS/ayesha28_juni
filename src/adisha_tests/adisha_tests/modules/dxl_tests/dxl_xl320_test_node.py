@@ -92,7 +92,7 @@ class DxlXl320SyncRWTestNode(Node):
                 self.joint_id.append(self.joint_id_param[i])
 
         for id in self.joint_id:
-            model_number, dxl_res, dxl_err = self.packethandler.write2ByteTxRx(self.porthandler, id, DXL_XL320_MODEL_ADDR)
+            model_number, dxl_res, dxl_err = self.packethandler.read2ByteTxRx(self.porthandler, id, DXL_XL320_MODEL_ADDR)
 
             if dxl_res != dxl.COMM_SUCCESS:
                 self.get_logger().error(f'ID#{id}: {self.packethandler.getTxRxResult(dxl_res)}')
@@ -103,7 +103,7 @@ class DxlXl320SyncRWTestNode(Node):
                 quit()
 
             else:
-                self.get_logger().info(f'ID#{id}: connected')
+                self.get_logger().info(f'ID#{id}: Connected')
                 dxl_res = self.sync_r_pos.addParam(id)
 
                 if dxl_res != True:
@@ -301,7 +301,7 @@ class DxlXl320RWTestNode(Node):
                 self.joint_id.append(self.joint_id_param[i])
 
         for id in self.joint_id:
-            model_number, dxl_res, dxl_err = self.packethandler.write2ByteTxRx(self.porthandler, id, DXL_XL320_MODEL_ADDR)
+            model_number, dxl_res, dxl_err = self.packethandler.read2ByteTxRx(self.porthandler, id, DXL_XL320_MODEL_ADDR)
 
             if dxl_res != dxl.COMM_SUCCESS:
                 self.get_logger().error(f'ID#{id}: {self.packethandler.getTxRxResult(dxl_res)}')
@@ -312,7 +312,7 @@ class DxlXl320RWTestNode(Node):
                 quit()
 
             else:
-                self.get_logger().info(f'ID#{id}: connected')
+                self.get_logger().info(f'ID#{id}: Connected')
 
 
 
