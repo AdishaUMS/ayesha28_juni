@@ -76,4 +76,5 @@ RUN chmod +x /rcl_entrypoint.sh
 
 # ------------[ ENTRYPOINT AND LOOP ]------------
 ENTRYPOINT ["/rcl_entrypoint.sh"]
+WORKDIR /adisha-os
 CMD ["tail", "-f", "/dev/null"]
