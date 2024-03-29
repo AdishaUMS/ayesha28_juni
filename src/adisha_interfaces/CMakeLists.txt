@@ -15,6 +15,7 @@ find_package(adisha_data)
 
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/TestMessage.msg"
   "msg/JointTorque.msg"
   "msg/JointPosition.msg"
   "msg/JointVelocity.msg"
