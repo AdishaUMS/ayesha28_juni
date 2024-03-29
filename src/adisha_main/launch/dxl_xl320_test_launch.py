@@ -18,7 +18,7 @@ with open(os.path.join(os.getcwd(), 'src/altair_data/config/joint_config.yaml'),
 
 def generate_launch_description():
 
-    dxl_mx28_test_node = Node(
+    dxl_xl320_test_node = Node(
         package     = 'adisha_tests',
         executable  = 'dxl_xl320_test',
         name        = f'{ROBOT_ID}_dxl_xl320_test',
@@ -31,5 +31,5 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        dxl_mx28_test_node
+        dxl_xl320_test_node
     ])
