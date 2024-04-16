@@ -1,4 +1,56 @@
-joint_num: 24
+dxl_baudrate: 1000000
+dxl_u2d2_port: /dev/ttyUSB0
+dxl_num: 24
+dxl_id:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+dxl_type:
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - XL320
+  - AX12A
+  - AX12A
+  - MX28
+  - MX28
+  - MX28
+  - MX28
+  - MX28
+  - MX28
+  - MX28
+  - MX28
+  - MX28
+  - MX28
 joint_name:
   - l_sho_r
   - r_sho_r
@@ -24,53 +76,3 @@ joint_name:
   - r_ank_p 
   - l_ank_r  
   - r_ank_r
-joint_id:
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
-  - 6
-  - 7
-  - 8
-  - 9
-  - 10
-  - 11
-  - 12
-  - 13
-  - 14
-  - 15
-  - 16
-  - 17
-  - 18
-  - 19
-  - 20
-  - 21
-  - 22
-  - 23
-  - 24
-joint_servo:
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - XL320
-  - AX12A
-  - AX12A
-  - MX28
-  - MX28
-  - MX28
-  - MX28
-  - MX28
-  - MX28
-  - MX28
-  - MX28
-  - MX28
-  - MX28

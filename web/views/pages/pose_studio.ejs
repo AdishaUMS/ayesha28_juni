@@ -3,21 +3,22 @@
 
 <head>
     <%- include('../partials/head') %>
-    <%- include('../scripts/onload_torque.ejs') %>
-    <%- include('../scripts/pose_studio_update') %>
-    <%- include('../scripts/pose_studio_toggle_torque') %>
-    <%- include('../scripts/pose_studio_apply_torque') %>
-    <%- include('../scripts/pose_studio_save_pose') %>
-    <%- include('../scripts/pose_studio_popup') %>
+    <script src="/js/navbar_utils.js"></script>
+    <script src="/js/pose_studio/button_utils.js"></script>
+    <script src="/js/pose_studio/table_update.js"></script>
+    <script src="/js/pose_studio/pose_select.js"></script>
+    <script src="/js/pose_studio/save.js"></script>
+    <script src="/js/pose_studio/onload.js"></script>
 </head>
 
-<body class="bg-slate-900" onload="onload_torque()">
+<body class="bg-gray-950 overflow-y-hidden" onload="on_load_update()">
     <%- include('../partials/navbar') %>
-    <div class="flex flex-row">
-        <%- include('../partials/pose_studio_table') %>
-        <%- include('../partials/pose_studio_button') %>
-        <%- include('../partials/pose_studio_pose_select') %>
+    <div class="m-4 flex flex-row">
+        <%- include('../partials/pose_studio/table') %>
+        <%- include('../partials/pose_studio/button') %>
     </div>
+    <%- include('../partials/pose_studio/pose_select_popup') %>
+    <%- include('../partials/pose_studio/save_popup') %>
 </body>
 
 </html>

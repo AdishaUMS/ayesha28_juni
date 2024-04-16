@@ -3,8 +3,7 @@ from setuptools import setup
 package_name = 'adisha_tests'
 package_list = [
     package_name,
-    package_name + '/modules',
-    package_name + '/modules/dxl_tests'
+    package_name + '/modules'
 ]
 
 setup(
@@ -25,10 +24,7 @@ setup(
     entry_points        = {
         'console_scripts': [
             'rclnode_test = adisha_tests.rclnode_test:main',
-            'custom_msg_test = adisha_tests.custom_msg_test:main',
-            'dxl_xl320_test = adisha_tests.dxl_xl320_test:main',
-            'dxl_ax12a_test = adisha_tests.dxl_ax12a_test:main',
-            'dxl_mx28_test = adisha_tests.dxl_mx28_test:main'
+            'custom_msg_test = adisha_tests.custom_msg_test:main'
         ],
     },
 )

@@ -1,7 +1,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-<link href="/css/output.css" rel="stylesheet">
-<title>Adisha - <%= page_name %></title>
+<link rel="stylesheet" type="text/css" href="/css/output.css">
+<title>Adisha App - <%= page_name %></title>
+<script>
+    var ADISHA_URL              = 'http://<%= robot_config.ip %>:3000/<%= robot_config.id %>'
+    var ADISHA_MASTER_CLOCK_MS  = parseFloat('<%= robot_config.master_clock %>')*1000
+    var ADISHA_DXL_NUM          = parseInt('<%= joint_config.dxl_num %>', 10)
+    var ADISHA_DXL_ID           = '<%= joint_config.dxl_id %>'.split(',').map((str) => {return parseInt(str, 10)})
+    var ADISHA_DXL_TYPE         = '<%= joint_config.dxl_type %>'.split(',')
+    var ADISHA_JOINT_NAME       = '<%= joint_config.joint_name %>'.split(',')
+</script>

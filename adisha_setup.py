@@ -24,12 +24,15 @@ def main(args=None) -> None:
 
 
     # Set the ID or namespace
-    print('[1/3] Insert the ID or namespace for this machine: ')
+    print('[1/4] Insert the ID or namespace for this machine: ')
     id = input('>> ')
+
+    print('[2/4] Insert the master clock frequency for this machine: ')
+    fc = float(input('>> '))
 
 
     # Get the local IP
-    print('[2/3] Insert the local network')
+    print('[3/4] Insert the local network')
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(0)
     
@@ -47,7 +50,7 @@ def main(args=None) -> None:
     print(f'>> {ip}')
 
     # Config file setup
-    print('[3/3] Setting up config files...')
+    print('[4/4] Setting up config files...')
     
     core_config_yaml = {
         'os_path': OS_PATH,
@@ -62,7 +65,8 @@ def main(args=None) -> None:
 
     robot_config_yaml = {
         'id': id,
-        'ip': ip
+        'ip': ip,
+        'master_clock': 1./fc
     }
     with open(HOST_ROBOT_CONFIG_PATH, 'w') as file:
         yaml.dump(robot_config_yaml, file)
