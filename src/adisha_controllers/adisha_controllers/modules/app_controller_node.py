@@ -368,7 +368,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -381,7 +381,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -394,7 +394,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -415,7 +415,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -428,7 +428,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -441,7 +441,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -462,7 +462,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -475,7 +475,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
@@ -488,7 +488,7 @@ class AppControllerNode(Node):
                 )
 
                 if res >= DXL_OK:
-                    ret_val.append(res)
+                    ret_val.append(float(res))
 
                 else:
                     ret_val.append(0.0)
