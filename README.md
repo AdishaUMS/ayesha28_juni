@@ -56,7 +56,7 @@ It is more convenient to develop and build the web on our own machine. But since
 
 ```console
 # On host machine
-colcon build --packages-select adisha_interfaces
+colcon build --packages-select adisha_data adisha_interfaces
 source install/setup.bash
 cd web/
 npm install
