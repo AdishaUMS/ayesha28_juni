@@ -64,13 +64,13 @@ npx generate-ros-messages
 ```
 
 > [!IMPORTANT]
-> Use the same node version (20.11.1).
-> To ease node version managing, install nvm with:
-> ```curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bas```
+>   Use the same node version (20.11.1).
+To ease node version managing, install nvm with:
+> ```curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash```.
 > Next, install the required node version with:
-> ```nvm install 20.11.1```
+> ```nvm install 20.11.1```.
 > Or, if the version has been installed:
-> ```nvm use 20.11.1```
+> ```nvm use 20.11.1```.
 
 ### **2.2 Launches**
 Remember to source the workspace's bash file everytime we open a new terminal with:
