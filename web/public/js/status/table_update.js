@@ -9,7 +9,7 @@ function status_table_update() {
         .then(data => {
             for(let i = 0; i < ADISHA_DXL_NUM; i++) {
                 document.getElementById(`pos_${ADISHA_DXL_ID[i]}`).innerHTML = data.present_position[i]
-                document.getElementById(`vel_${ADISHA_DXL_ID[i]}`).innerHTML = data.present_velocity[i]
+                document.getElementById(`vel_${ADISHA_DXL_ID[i]}`).innerHTML = data.present_speed[i]
                 document.getElementById(`temp_${ADISHA_DXL_ID[i]}`).innerHTML = data.joint_sensor.temperature[i].toFixed(2)
                 document.getElementById(`volt_${ADISHA_DXL_ID[i]}`).innerHTML = data.joint_sensor.voltage[i].toFixed(2)
                 document.getElementById(`load_${ADISHA_DXL_ID[i]}`).innerHTML = data.joint_sensor.load[i].toFixed(2)

@@ -16,7 +16,7 @@ class RclGateway {
         this.res_msg = {
             present_torque: null,
             present_position: null,
-            present_velocity: null,
+            present_speed: null,
             joint_sensor: {
                 load: null,
                 voltage: null,
@@ -27,12 +27,12 @@ class RclGateway {
         this.req_msg = {
             goal_torque: {val: null},
             goal_position: {val: null},
-            goal_velocity: {val: null}
+            goal_speed: {val: null}
         }
 
         this.set_torque     = false
         this.set_position   = false
-        this.set_velocity   = false
+        this.set_speed   = false
     }
 
 
@@ -58,9 +58,9 @@ class RclGateway {
 
             node.createSubscription(
                 'adisha_interfaces/msg/JointVelocity',
-                `${this.robot_config.id}/present_velocity`,
+                `${this.robot_config.id}/present_speed`,
                 (msg) => {
-                    this.res_msg.present_velocity = msg.val
+                    this.res_msg.present_speed = msg.val
                 }
             )
 
@@ -84,9 +84,9 @@ class RclGateway {
                 `${this.robot_config.id}/goal_position`
             )
 
-            const goal_velocity_pub = node.createPublisher(
+            const goal_speed_pub = node.createPublisher(
                 'adisha_interfaces/msg/JointVelocity',
-                `${this.robot_config.id}/goal_velocity`
+                `${this.robot_config.id}/goal_speed`
             )
 
             setInterval(() => {
@@ -100,8 +100,8 @@ class RclGateway {
                     goal_position_pub.publish(this.req_msg.goal_position)
                 }
 
-                if(this.set_velocity) {
-                    this.set_velocity = false
+                if(this.set_speed) {
+                    this.set_speed = false
                 }
             }, 50)
             

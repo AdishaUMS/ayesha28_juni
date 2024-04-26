@@ -28,7 +28,7 @@ class DummyAppControllerNode(Node):
         self.MASTER_CLOCK   = self.get_parameter('master_clock').value
 
         self.present_position   = [0 for __ in range(self.DXL_NUM)]
-        self.present_velocity   = [0 for __ in range(self.DXL_NUM)]
+        self.present_speed   = [0 for __ in range(self.DXL_NUM)]
         self.present_torque     = [0 for __ in range(self.DXL_NUM)] 
 
         self.goal_torque_sub = self.create_subscription(
@@ -45,10 +45,10 @@ class DummyAppControllerNode(Node):
             qos_profile = 10
         )
 
-        self.goal_velocity_sub = self.create_subscription(
+        self.goal_speed_sub = self.create_subscription(
             msg_type    = adisha_interfaces.JointVelocity,
-            topic       = f'{self.ID}/goal_velocity',
-            callback    = self.goalVelocitySubCallback,
+            topic       = f'{self.ID}/goal_speed',
+            callback    = self.goalSpeedSubCallback,
             qos_profile = 10
         )
 
@@ -70,9 +70,9 @@ class DummyAppControllerNode(Node):
             qos_profile = 10
         )
 
-        self.present_velocity_pub = self.create_publisher(
+        self.present_speed_pub = self.create_publisher(
             msg_type    = adisha_interfaces.JointVelocity,
-            topic       = f'{self.ID}/present_velocity',
+            topic       = f'{self.ID}/present_speed',
             qos_profile = 10
         )
 
@@ -91,11 +91,11 @@ class DummyAppControllerNode(Node):
 
 
 
-    def goalVelocitySubCallback(self, msg:adisha_interfaces.JointVelocity) -> None:
+    def goalSpeedSubCallback(self, msg:adisha_interfaces.JointVelocity) -> None:
         for i in range(self.DXL_NUM):
-            self.present_velocity[i] = msg.val[i]
+            self.present_speed[i] = msg.val[i]
 
-        self.get_logger().info(f'[{self.ID}/goal_velocity]: velocity received')
+        self.get_logger().info(f'[{self.ID}/goal_speed]: speed received')
 
 
 
@@ -111,21 +111,21 @@ class DummyAppControllerNode(Node):
         for i in range(self.DXL_NUM):
             if self.present_torque[i] == 0:
                 self.present_position[i]    = np.random.randint(0, 4096)
-                self.present_velocity[i]    = np.random.randint(0, 4096)
+                self.present_speed[i]       = np.random.randint(0, 4096)
 
         present_position_msg    = adisha_interfaces.JointPosition()
-        present_velocity_msg    = adisha_interfaces.JointVelocity()
+        present_speed_msg       = adisha_interfaces.JointVelocity()
         present_torque_msg      = adisha_interfaces.JointTorque()
         joint_sensor_msg        = adisha_interfaces.JointSensor()
 
-        present_position_msg.val    = self.present_position[:]
-        present_velocity_msg.val    = self.present_velocity[:]
-        present_torque_msg.val      = self.present_torque[:]
+        present_position_msg.val        = self.present_position[:]
+        present_speed_msg.val           = self.present_speed[:]
+        present_torque_msg.val          = self.present_torque[:]
         joint_sensor_msg.load           = [(2.0*np.random.rand() - 1.0)*3.0 for __ in range(self.DXL_NUM)]
         joint_sensor_msg.voltage        = [2.0*np.random.rand() + 13.0 for __ in range(self.DXL_NUM)]
         joint_sensor_msg.temperature    = [np.random.rand()*100. for __ in range(self.DXL_NUM)]
 
         self.present_position_pub.publish(present_position_msg)
-        self.present_velocity_pub.publish(present_velocity_msg)
+        self.present_speed_pub.publish(present_speed_msg)
         self.present_torque_pub.publish(present_torque_msg)  
         self.joint_sensor_pub.publish(joint_sensor_msg)
