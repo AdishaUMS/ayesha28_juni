@@ -630,19 +630,19 @@ class AppControllerNode(Node):
         present_torque_msg      = adisha_interfaces.JointTorque()
         present_position_msg    = adisha_interfaces.JointPosition()
         present_speed_msg       = adisha_interfaces.JointVelocity()
-        joint_sensor_msg        = adisha_interfaces.JointSensor()
+        # joint_sensor_msg        = adisha_interfaces.JointSensor()
 
-        present_torque_msg.val          = self.readTorque()
-        present_position_msg.val        = self.readPresentPosition()
-        present_speed_msg.val           = self.readPresentSpeed()
-        joint_sensor_msg.load           = self.readPresentLoad()
-        joint_sensor_msg.voltage        = self.readPresentVoltage()
-        joint_sensor_msg.temperature    = self.readPresentTemperature()
+        present_torque_msg.val      = self.readTorque()
+        present_position_msg.val    = self.readPresentPosition()
+        present_speed_msg.val       = self.readPresentSpeed()
+        # joint_sensor_msg.load           = self.readPresentLoad()
+        # joint_sensor_msg.voltage        = self.readPresentVoltage()
+        # joint_sensor_msg.temperature    = self.readPresentTemperature()
 
         self.present_torque_pub.publish(present_torque_msg)
         self.present_position_pub.publish(present_position_msg)
         self.present_speed_pub.publish(present_speed_msg)
-        self.joint_sensor_pub.publish(joint_sensor_msg)
+        # self.joint_sensor_pub.publish(joint_sensor_msg)
 
         if self.write_torque:
             self.write_torque = False
