@@ -25,7 +25,8 @@ setup(
     entry_points        = {
         'console_scripts': [
             '_dummy_app_controller = adisha_controllers._dummy_app_controller:main',
-            'app_controller = adisha_controllers.app_controller:main'
+            'app_controller = adisha_controllers.app_controller:main',
+            'motion_player = adisha_controllers.motion_player:main'
         ],
     },
 )
