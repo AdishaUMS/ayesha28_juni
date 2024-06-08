@@ -68,7 +68,7 @@ RUN apt-get update && \
     pip install --no-cache-dir \ 
     numpy \
     pyyaml \
-    vqf \
+    RPi.GPIO \
     && \
     apt-get remove -y pip
 
