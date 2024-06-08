@@ -26,10 +26,10 @@ with open(JOINT_CONFIG_PATH, 'r') as file:
 
 def generate_launch_description():
     
-    app_controller_node = Node(
+    dxl_torque_enabler_node = Node(
         package     = 'adisha_controllers',
-        executable  = '_dummy_app_controller',
-        name        = f'{ROBOT_ID}_dummy_app_controller',
+        executable  = 'dxl_torque_enabler',
+        name        = f'{ROBOT_ID}_dxl_torque_enabler',
         parameters  = [
             {'id': ROBOT_ID},
             {'dxl_baudrate': DXL_BAUDRATE},
@@ -42,13 +42,6 @@ def generate_launch_description():
         ]
     )
 
-    app_launcher_node = Node(
-        package     = 'adisha_interfaces',
-        executable  = 'app_launcher',
-        name        = f'{ROBOT_ID}_app_launcher'
-    )
-
     return LaunchDescription([
-        app_controller_node,
-        app_launcher_node
+        dxl_torque_enabler_node
     ])

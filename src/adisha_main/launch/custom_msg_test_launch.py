@@ -4,8 +4,6 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
-CORE_CONFIG_PATH    = os.path.join(os.getcwd(), 'src/adisha_data/config/core_config.yaml')
-JOINT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/joint_config.yaml')
 ROBOT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/robot_config.yaml')
 
 

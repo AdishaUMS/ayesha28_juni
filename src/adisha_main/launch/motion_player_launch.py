@@ -4,11 +4,8 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
-CORE_CONFIG_PATH    = os.path.join(os.getcwd(), 'src/adisha_data/config/core_config.yaml')
 JOINT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/joint_config.yaml')
 ROBOT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/robot_config.yaml')
-POSE_PATH           = os.path.join(os.getcwd(), 'src/adisha_data/data/pose_studio')
-MOTION_PATH         = os.path.join(os.getcwd(), 'src/adisha_data/data/motion_sequencer')
 
 
 with open(ROBOT_CONFIG_PATH, 'r') as file:
@@ -41,12 +38,7 @@ def generate_launch_description():
             {'dxl_id': DXL_ID},
             {'dxl_type': DXL_TYPE},
             {'joint_name': JOINT_NAME},
-            {'master_clock': MASTER_CLOCK},
-            {'pose_path': POSE_PATH},
-            {'motion_path': MOTION_PATH}, 
-            {'motions': [
-                'motion01'
-            ]}
+            {'master_clock': MASTER_CLOCK}
         ]
     )
 
