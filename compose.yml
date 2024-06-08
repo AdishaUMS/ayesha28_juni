@@ -5,8 +5,10 @@ services:
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
       - /dev/i2c-1:/dev/i2c-1
+      - /dev/gpiomem:/dev/gpiomem
     volumes:
       - ./src:/adisha-os/src
       - ./web:/adisha-os/web
+      - /sys:/sys
     ports:
       - "3000:3000"
