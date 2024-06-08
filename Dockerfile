@@ -57,13 +57,18 @@ RUN apt-get update && \
     apt-get install -y npm lsof && \
     npm install -g node@20.11.1
 
+# ------------[ SMBUS ]------------
+RUN apt-get update && \
+    apt-get install -y python3-smbus
+
 # ------------[ PYTHON LIBRARIES ]------------
 RUN apt-get update && \
     apt-get install -y pip && \
     pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir \ 
     numpy \
-    pyyaml \ 
+    pyyaml \
+    vqf \
     && \
     apt-get remove -y pip
 
