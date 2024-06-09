@@ -1,6 +1,7 @@
 # **adisha-os**
 A ROS2-based framework for Adisha UMS robot development.
 
+
 ## **1. Installation**
 We use Docker to develop the robot since the program maybe deployed in various machines. Note that we can directly ```colcon build``` this repository if we are working on a machine that matches the requirements for ROS2 Humble. Or else, do the following steps to begin working with this repository:
 
@@ -63,15 +64,6 @@ npm install
 npx generate-ros-messages
 ```
 
-#### **c. Dynamixel SDK Compatibility**
-Adisha team use 3 different type of Dynamixel Servos: XL320 (2.0), AX12A (1.0), and MX28 (1.0). The R/W method compatibility are shown below.
-
-| DXL Type | Sync R | Sync W | Bulk R | Bulk W |
-|:-:|:-:|:-:|:-:|:-:|
-|XL320 (2.0)| NO | **OK** | NO | NO |
-|AX12A (1.0)| NO | **OK** | NO | NO |
-|MX28 (1.0)| NO | **OK** | **OK** | NO |
-
 > [!IMPORTANT]
 >   Use the same node version (20.11.1).
 To ease node version managing, install nvm with:
@@ -80,6 +72,15 @@ To ease node version managing, install nvm with:
 > ```nvm install 20.11.1```.
 > Or, if the version has been installed:
 > ```nvm use 20.11.1```.
+
+#### **c. Dynamixel SDK Compatibility**
+Adisha team use 3 different types of Dynamixel servo: XL320 (2.0), AX12A (1.0), and MX28 (1.0). The R/W method compatibility are shown below.
+
+| DXL Type | Sync R | Sync W | Bulk R | Bulk W |
+|:-:|:-:|:-:|:-:|:-:|
+|XL320 (2.0)| NO | **OK** | NO | NO |
+|AX12A (1.0)| NO | **OK** | NO | NO |
+|MX28 (1.0)| NO | **OK** | **OK** | NO |
 
 ### **2.2 Launches**
 Remember to source the workspace's bash file everytime we open a new terminal with:
