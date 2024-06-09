@@ -6,8 +6,9 @@ def main(args=None) -> None:
     rclpy.init()
     node = MotionPlayerNode()
     node.dxlSearch()
-    node.loadMotions()
-    node.playMotion()
+    node.enableTorque()
+
+    rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

@@ -28,6 +28,29 @@ function on_load_update() {
             else if(event.key == 'ArrowDown') {
                 tpos_element.value = parseInt(tpos_element.value, 10) - 1
             }
+            if(event.key == 'ArrowUp' || event.key == 'ArrowDown') {
+                let goal_pos = []
+        
+                for(let i = 0; i < ADISHA_DXL_NUM; i++) {
+                    let val = parseInt(document.getElementById(`tpos_${ADISHA_DXL_ID[i]}`).value, 10)
+                    goal_pos.push(val)
+                }
+                
+                fetch(`${ADISHA_URL}/api/set_position`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        goal_position: goal_pos
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error: ', error);
+                    });
+            }
         })
     }
 

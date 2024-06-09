@@ -1,0 +1,26 @@
+filename: pose_test03.yaml
+torque_enable:
+  - 1   # ID->1  : l_sho_p
+  - 1   # ID->2  : r_sho_p
+  - 1   # ID->3  : l_sho_r
+  - 1   # ID->4  : r_sho_r
+  - 0   # ID->5  : l_arm_y
+  - 0   # ID->6  : r_arm_y
+  - 0   # ID->7  : l_arm_p
+  - 0   # ID->8  : r_arm_p
+  - 1   # ID->9  : l_wrist
+  - 1   # ID->10 : r_wrist
+  - 1   # ID->11 : neck
+  - 1   # ID->12 : head
+  - 1   # ID->13 : l_hip_y
+  - 1   # ID->14 : r_hip_y
+  - 1   # ID->15 : l_hip_r
+  - 1   # ID->16 : r_hip_r
+  - 1   # ID->17 : l_hip_p
+  - 1   # ID->18 : r_hip_p
+  - 1   # ID->19 : l_knee
+  - 1   # ID->20 : r_knee
+  - 1   # ID->21 : l_ank_p
+  - 1   # ID->22 : r_ank_p
+  - 1   # ID->23 : l_ank_r
+  - 1   # ID->24 : r_ank_r

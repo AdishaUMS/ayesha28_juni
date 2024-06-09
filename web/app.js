@@ -5,12 +5,12 @@ const rclgw     = require('./src/js/rcl-gateway')
 
 const app       = express()
 const port      = 3000
-const rclnode   = new rclgw()
+const rclnode   = new rclgw.RclGateway()
 
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, './views'))
 app.use(express.static(path.join(__dirname, './public')))
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
 rclnode.init()
@@ -30,6 +30,8 @@ app.get(`/${config.robot_config.id}`, (req, res) => {
 })
 
 app.get(`/${config.robot_config.id}/status`, (req, res) => {
+    rclnode.mode = rclgw.MODE_STATUS
+
     res.render('pages/status', {
         page_name: 'Status',
         robot_config: config.robot_config,
@@ -38,6 +40,8 @@ app.get(`/${config.robot_config.id}/status`, (req, res) => {
 })
 
 app.get(`/${config.robot_config.id}/pose_studio`, (req, res) => {
+    rclnode.mode = rclgw.MODE_POSE_STUDIO
+
     res.render('pages/pose_studio', {
         page_name: 'Pose Studio',
         robot_config: config.robot_config,
@@ -46,6 +50,8 @@ app.get(`/${config.robot_config.id}/pose_studio`, (req, res) => {
 })
 
 app.get(`/${config.robot_config.id}/motion_sequencer`, (req, res) => {
+    rclnode.mode = rclgw.MODE_MOTION_SEQUENCER
+
     res.render('pages/motion_sequencer', {
         page_name: 'Motion Sequencer',
         robot_config: config.robot_config,

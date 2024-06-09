@@ -52,10 +52,10 @@ dxl_type:
   - MX28
   - MX28
 joint_name:
-  - l_sho_r
-  - r_sho_r
   - l_sho_p
   - r_sho_p
+  - l_sho_r
+  - r_sho_r
   - l_arm_y
   - r_arm_y
   - l_arm_p

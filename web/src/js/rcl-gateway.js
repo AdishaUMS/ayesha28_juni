@@ -4,6 +4,9 @@ const fs        = require('fs')
 const jsyaml    = require('js-yaml')
 const config    = require('./config')
 
+const MODE_STATUS           = 1
+const MODE_POSE_STUDIO      = 2
+const MODE_MOTION_SEQUENCER = 3
 
 class RclGateway {
 
@@ -30,9 +33,10 @@ class RclGateway {
             goal_speed: {val: null}
         }
 
+        this.mode           = 0
         this.set_torque     = false
         this.set_position   = false
-        this.set_speed   = false
+        this.set_speed      = false
     }
 
 
@@ -89,7 +93,32 @@ class RclGateway {
                 `${this.robot_config.id}/goal_speed`
             )
 
+            const feature_enable_pub = node.createPublisher(
+                'adisha_interfaces/msg/FeatureEnable',
+                `${this.robot_config.id}/feature_enable`
+            )
+
             setInterval(() => {
+                if(this.mode == MODE_STATUS) {
+                    this.mode = 0
+                    feature_enable_pub.publish({
+                        torque_r: false,
+                        position_r: true,
+                        speed_r: true,
+                        sensor_r: true
+                    })
+                }
+
+                else if(this.mode == MODE_POSE_STUDIO || this.mode == MODE_MOTION_SEQUENCER) {
+                    this.mode = 0
+                    feature_enable_pub.publish({
+                        torque_r: false,
+                        position_r: true,
+                        speed_r: false,
+                        sensor_r: false
+                    })
+                }
+                
                 if(this.set_torque) {
                     this.set_torque = false
                     goal_torque_pub.publish(this.req_msg.goal_torque)
@@ -103,7 +132,7 @@ class RclGateway {
                 if(this.set_speed) {
                     this.set_speed = false
                 }
-            }, 50)
+            }, 300)
             
             node.spin()
         })
@@ -185,5 +214,7 @@ class RclGateway {
     }
 }
 
-
-module.exports = RclGateway
+module.exports.MODE_STATUS              = MODE_STATUS
+module.exports.MODE_POSE_STUDIO         = MODE_POSE_STUDIO
+module.exports.MODE_MOTION_SEQUENCER    = MODE_MOTION_SEQUENCER
+module.exports.RclGateway               = RclGateway

@@ -1,9 +1,8 @@
-import os
-import yaml
-import time
 import rclpy
 from rclpy.node import Node
 from .dxl_type.dxl_controller import *
+import adisha_interfaces.msg as adisha_interfaces
+import time 
 
 
 
@@ -19,9 +18,9 @@ class MotionPlayerNode(Node):
         self.declare_parameter('dxl_type', rclpy.Parameter.Type.STRING_ARRAY)
         self.declare_parameter('joint_name', rclpy.Parameter.Type.STRING_ARRAY)
         self.declare_parameter('master_clock', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('pose_path', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('motion_path', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('motions', rclpy.Parameter.Type.STRING_ARRAY)
+        self.declare_parameter('kp_val', rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter('ki_val', rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter('kd_val', rclpy.Parameter.Type.DOUBLE)
 
         self.ID             = self.get_parameter('id').value
         self.DXL_BAUDRATE   = self.get_parameter('dxl_baudrate').value
@@ -31,10 +30,10 @@ class MotionPlayerNode(Node):
         self.DXL_TYPE       = self.get_parameter('dxl_type').value
         self.JOINT_NAME     = self.get_parameter('joint_name').value
         self.MASTER_CLOCK   = self.get_parameter('master_clock').value
-        self.POSE_PATH      = self.get_parameter('pose_path').value
-        self.MOTION_PATH    = self.get_parameter('motion_path').value
-        self.MOTIONS        = self.get_parameter('motions').value
-        
+        self.KP_VAL         = self.get_parameter('kp_val').value
+        self.KI_VAL         = self.get_parameter('ki_val').value
+        self.KD_VAL         = self.get_parameter('kd_val').value
+
         self.xl320_id_list  = []
         self.xl320_id_set   = set(())
         self.xl320_name     = dict(())
@@ -47,19 +46,9 @@ class MotionPlayerNode(Node):
         self.mx28_id_set    = set(())
         self.mx28_name      = dict(())
 
-        self.pose_num       = 0
-        self.pose_list      = []
-        self.delay_list     = []
-        self.duration_list  = []
-        self.speed_list     = []
-
-        self.write_torque   = False
-        self.write_position = False
-        self.write_speed    = False
-
-        self.goal_torque    = []
-        self.goal_position  = []
-        self.goal_speed     = []
+        self.present_position   = dict(())
+        self.goal_position      = dict(())
+        self.goal_speed         = dict(())
 
         self.porthandler    = dxl.PortHandler(self.DXL_U2D2_PORT)
         self.packethandler1 = dxl.PacketHandler(1.0)
@@ -92,6 +81,18 @@ class MotionPlayerNode(Node):
             self.packethandler2
         )
 
+        self.goal_position_sub = self.create_subscription(
+            msg_type    = adisha_interfaces.JointPosition,
+            topic       = f'{self.ID}/goal_position',
+            callback    = self.goalPositionSubCallback,
+            qos_profile = 1000
+        )
+
+        self.player_timer = self.create_timer(
+            0.3,
+            self.playerTimerCallback
+        )
+
 
     
     def dxlSearch(self) -> None:
@@ -99,6 +100,10 @@ class MotionPlayerNode(Node):
             dxl_id      = self.DXL_ID[i]
             dxl_type    = self.DXL_TYPE[i]
             joint_name  = self.JOINT_NAME[i]
+
+            self.present_position.update({dxl_id: 0})
+            self.goal_position.update({dxl_id: 0})
+            self.goal_speed.update({dxl_id: 200})
 
             if dxl_type == 'XL320':
                 self.xl320_id_list.append(dxl_id)
@@ -172,190 +177,156 @@ class MotionPlayerNode(Node):
 
 
 
-    def writeTorque(self) -> None:
-        for i in range(self.DXL_NUM):
-            if self.DXL_ID[i] in self.xl320_id_set:
-                res = self.dxl_controller2.write(
-                    address = DXL_XL320_TORQUE_ENABLE_ADDR,
-                    size    = DXL_XL320_TORQUE_ENABLE_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_torque[i]
-                )
+    def enableTorque(self) -> None:
+        res = self.dxl_controller2.groupSyncWrite(
+            address = DXL_XL320_TORQUE_ENABLE_ADDR,
+            size    = DXL_XL320_TORQUE_ENABLE_SIZE,
+            dxl_id  = self.xl320_id_list,
+            params   = [[1] for __ in self.xl320_id_list]
+        )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Write torque failed')
-
-            elif self.DXL_ID[i] in self.ax12a_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_AX12A_TORQUE_ENABLE_ADDR,
-                    size    = DXL_AX12A_TORQUE_ENABLE_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_torque[i]
-                )
-
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Write torque failed')
-
-            elif self.DXL_ID[i] in self.mx28_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_MX28_TORQUE_ENABLE_ADDR,
-                    size    = DXL_MX28_TORQUE_ENABLE_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_torque[i]
-                )
-
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Write torque failed')
+        if res < DXL_OK:
+            self.get_logger().error('XL320 group sync write torque failed')
 
 
-    
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_AX12A_TORQUE_ENABLE_ADDR,
+            size    = DXL_AX12A_TORQUE_ENABLE_SIZE,
+            dxl_id  = self.ax12a_id_list,
+            params   = [[1] for __ in self.ax12a_id_list]
+        )
+
+        if res < DXL_OK:
+            self.get_logger().error('AX12A group sync write torque failed')
+
+
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_MX28_TORQUE_ENABLE_ADDR,
+            size    = DXL_MX28_TORQUE_ENABLE_SIZE,
+            dxl_id  = self.mx28_id_list,
+            params   = [[1] for __ in self.mx28_id_list]
+        )
+
+        if res < DXL_OK:
+            self.get_logger().error('MX28 group sync write torque failed')
+
+
+
     def writeGoalPosition(self) -> None:
-        for i in range(self.DXL_NUM):
-            if self.DXL_ID[i] in self.xl320_id_set:
-                res = self.dxl_controller2.write(
-                    address = DXL_XL320_GOAL_POSITION_ADDR,
-                    size    = DXL_XL320_GOAL_POSITION_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_position[i]
-                )
+        res = self.dxl_controller2.groupSyncWrite(
+            address = DXL_XL320_GOAL_POSITION_ADDR,
+            size    = DXL_XL320_GOAL_POSITION_SIZE,
+            dxl_id  = self.xl320_id_list,
+            params  = [self.dxl_controller2.convert2ByteToDxl(self.goal_position[dxl_id]) for dxl_id in self.xl320_id_list]
+        )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Write position failed')
+        if res < DXL_OK:
+            self.get_logger().error('XL320 group sync write position failed')
 
-            elif self.DXL_ID[i] in self.ax12a_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_AX12A_GOAL_POSITION_ADDR,
-                    size    = DXL_AX12A_GOAL_POSITION_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_position[i]
-                )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Write position failed')
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_AX12A_GOAL_POSITION_ADDR,
+            size    = DXL_AX12A_GOAL_POSITION_SIZE,
+            dxl_id  = self.ax12a_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_position[dxl_id]) for dxl_id in self.ax12a_id_list]
+        )
 
-            elif self.DXL_ID[i] in self.mx28_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_MX28_GOAL_POSITION_ADDR,
-                    size    = DXL_MX28_GOAL_POSITION_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_position[i]
-                )
+        if res < DXL_OK:
+            self.get_logger().error('AX12A group sync write position failed')
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Write position failed')
+
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_MX28_GOAL_POSITION_ADDR,
+            size    = DXL_MX28_GOAL_POSITION_SIZE,
+            dxl_id  = self.mx28_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_position[dxl_id]) for dxl_id in self.mx28_id_list]
+        )
+
+        if res < DXL_OK:
+            self.get_logger().error('MX28 group sync write position failed')
 
 
 
     def writeGoalSpeed(self) -> None:
-        for i in range(self.DXL_NUM):
-            if self.DXL_ID[i] in self.xl320_id_set:
-                res = self.dxl_controller2.write(
-                    address = DXL_XL320_GOAL_SPEED_ADDR,
-                    size    = DXL_XL320_GOAL_SPEED_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_speed[i]
-                )
+        res = self.dxl_controller2.groupSyncWrite(
+            address = DXL_XL320_GOAL_SPEED_ADDR,
+            size    = DXL_XL320_GOAL_SPEED_SIZE,
+            dxl_id  = self.xl320_id_list,
+            params  = [self.dxl_controller2.convert2ByteToDxl(self.goal_speed[dxl_id]) for dxl_id in self.xl320_id_list]
+        )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Write speed failed')
-
-            elif self.DXL_ID[i] in self.ax12a_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_AX12A_GOAL_SPEED_ADDR,
-                    size    = DXL_AX12A_GOAL_SPEED_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_speed[i]
-                )
-
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Write speed failed')
-
-            elif self.DXL_ID[i] in self.mx28_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_MX28_GOAL_SPEED_ADDR,
-                    size    = DXL_MX28_GOAL_SPEED_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_speed[i]
-                )
-
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Write speed failed')
+        if res < DXL_OK:
+            self.get_logger().error('XL320 group sync write speed failed')
 
 
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_AX12A_GOAL_SPEED_ADDR,
+            size    = DXL_AX12A_GOAL_SPEED_SIZE,
+            dxl_id  = self.ax12a_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_speed[dxl_id]) for dxl_id in self.ax12a_id_list]
+        )
 
-    def loadMotions(self) -> None:
-        XL320_DEG_PER_BIT   = 0.29
-        XL320_DPS_PER_BIT   = 0.111*6.0
-        XL320_DPS_MIN       = 1
-        XL320_DPS_MAX       = 1023
-        AX12A_DEG_PER_BIT   = 0.29
-        AX12A_DPS_PER_BIT   = 0.111*6.0
-        AX12A_DPS_MIN       = 1
-        AX12A_DPS_MAX       = 1023
-        MX28_DEG_PER_BIT    = 0.088
-        MX28_DPS_PER_BIT    = 0.114*6.0
-        MX28_DPS_MIN        = 1
-        MX28_DPS_MAX        = 1023
+        if res < DXL_OK:
+            self.get_logger().error('AX12A group sync write speed failed')
 
-        for motion in self.MOTIONS:
-            self.get_logger().info(f'Loading motion: {motion}.yaml...')
-            motion_path = os.path.join(self.MOTION_PATH, f'{motion}.yaml')
 
-            with open(motion_path, 'r') as file:
-                motion_yaml = yaml.safe_load(file)
-            
-            for val in motion_yaml['val']:
-                pose_path = os.path.join(self.POSE_PATH, val[0])
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_MX28_GOAL_SPEED_ADDR,
+            size    = DXL_MX28_GOAL_SPEED_SIZE,
+            dxl_id  = self.mx28_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_speed[dxl_id]) for dxl_id in self.mx28_id_list]
+        )
 
-                with open(pose_path, 'r') as file:
-                    pose_yaml = yaml.safe_load(file)
+        if res < DXL_OK:
+            self.get_logger().error('MX28 group sync write speed failed')
 
-                self.pose_list.append(pose_yaml['val'])
-                self.delay_list.append(val[1])
-                self.duration_list.append(val[2])
-                self.pose_num += 1
 
-        for i in range(self.pose_num):
-            self.get_logger().info(f'Configuring speed [{i + 1}/{self.pose_num}]')
+    
+    def readPresentPosition(self) -> None:
+        ERR_HANDLE_VAL = 999999
 
-            if i == 0:
-                self.speed_list.append([450 for __ in range(self.DXL_NUM)])
-                continue
+        for dxl_id in self.xl320_id_list:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_PRESENT_POSITION_ADDR,
+                size    = DXL_XL320_PRESENT_POSITION_SIZE,
+                dxl_id  = dxl_id
+            )
 
-            temp_speed_list = []
+            if res >= DXL_OK:
+                self.present_position[dxl_id] = res
 
-            for j in range(self.DXL_NUM):
-                if self.DXL_ID[j] in self.xl320_id_set:
-                    speed = int(round(abs(self.pose_list[i][j] - self.pose_list[i - 1][j])*(XL320_DEG_PER_BIT*1000./self.duration_list[i])/XL320_DPS_PER_BIT))
-                    if speed > XL320_DPS_MAX:   speed = XL320_DPS_MAX
-                    elif speed < XL320_DPS_MIN: speed = XL320_DPS_MIN
-                    temp_speed_list.append(speed)
+        for dxl_id in self.ax12a_id_list:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_PRESENT_POSITION_ADDR,
+                size    = DXL_AX12A_PRESENT_POSITION_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                elif self.DXL_ID[j] in self.ax12a_id_set:
-                    speed = int(round(abs(self.pose_list[i][j] - self.pose_list[i - 1][j])*(AX12A_DEG_PER_BIT*1000./self.duration_list[i])/AX12A_DPS_PER_BIT))
-                    if speed > AX12A_DPS_MAX:   speed = AX12A_DPS_MAX
-                    elif speed < AX12A_DPS_MIN: speed = AX12A_DPS_MIN
-                    temp_speed_list.append(speed)
+            if res >= DXL_OK:
+                self.present_position[dxl_id] = res
 
-                elif self.DXL_ID[j] in self.mx28_id_set:
-                    speed = int(round(abs(self.pose_list[i][j] - self.pose_list[i - 1][j])*(MX28_DEG_PER_BIT*1000./self.duration_list[i])/MX28_DPS_PER_BIT))
-                    if speed > MX28_DPS_MAX:    speed = MX28_DPS_MAX
-                    elif speed < MX28_DPS_MIN:  speed = MX28_DPS_MIN
-                    temp_speed_list.append(speed)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_PRESENT_POSITION_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_PRESENT_POSITION_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-            self.speed_list.append(temp_speed_list)
+        for i in range(len(self.mx28_id_list)):
+            if res[i] >= DXL_OK:
+                self.present_position[self.mx28_id_list[i]] = res[i]
 
 
 
-    def playMotion(self) -> None:
-        TIME_TOLERANCE_MS = 20
+    def goalPositionSubCallback(self, msg:adisha_interfaces.JointPosition) -> None:
+        for i in range(len(msg.dxl_id)):
+            self.goal_position[msg.dxl_id[i]] = msg.val[i]
 
-        for i in range(self.pose_num):
-            time.sleep(float(self.delay_list[i])/1000.)
 
-            self.goal_speed     = self.speed_list[i][:]
-            self.goal_position  = self.pose_list[i][:]
-            self.writeGoalSpeed()
-            self.writeGoalPosition()
 
-            time.sleep(float(self.duration_list[i])/1000. + TIME_TOLERANCE_MS)
+    def playerTimerCallback(self) -> None:
+        self.readPresentPosition()
+        self.goal_position = self.present_position.copy()
+        self.writeGoalSpeed()
+        self.writeGoalPosition()

@@ -43,16 +43,21 @@ class AppControllerNode(Node):
         self.write_position = False
         self.write_speed    = False
 
-        self.goal_torque    = []
-        self.goal_position  = []
-        self.goal_speed     = []
+        self.read_torque    = False
+        self.read_position  = False
+        self.read_speed     = False
+        self.read_sensor    = False
 
-        self.present_torque         = []
-        self.present_position       = []
-        self.present_speed          = []
-        self.present_load           = []
-        self.present_voltage        = []
-        self.present_temperature    = []
+        self.goal_torque    = dict(())
+        self.goal_position  = dict(())
+        self.goal_speed     = dict(())
+
+        self.present_torque         = dict(())
+        self.present_position       = dict(())
+        self.present_speed          = dict(())
+        self.present_load           = dict(())
+        self.present_voltage        = dict(())
+        self.present_temperature    = dict(())
 
         self.porthandler    = dxl.PortHandler(self.DXL_U2D2_PORT)
         self.packethandler1 = dxl.PacketHandler(1.0)
@@ -106,6 +111,13 @@ class AppControllerNode(Node):
             qos_profile = 1000
         )
 
+        self.feature_en_sub = self.create_subscription(
+            msg_type    = adisha_interfaces.FeatureEnable,
+            topic       = f'{self.ID}/feature_enable',
+            callback    = self.featureEnSubCallback,
+            qos_profile = 1000
+        )
+
         self.present_torque_pub = self.create_publisher(
             msg_type    = adisha_interfaces.JointTorque,
             topic       = f'{self.ID}/present_torque',
@@ -143,6 +155,16 @@ class AppControllerNode(Node):
             dxl_type    = self.DXL_TYPE[i]
             joint_name  = self.JOINT_NAME[i]
 
+            self.goal_torque.update({dxl_id: 0})
+            self.goal_position.update({dxl_id: 0})
+            self.goal_speed.update({dxl_id: 0})
+            self.present_torque.update({dxl_id: 0})
+            self.present_position.update({dxl_id: 0})
+            self.present_speed.update({dxl_id: 0})
+            self.present_load.update({dxl_id: 0})
+            self.present_voltage.update({dxl_id: 0})
+            self.present_temperature.update({dxl_id: 0})
+
             if dxl_type == 'XL320':
                 self.xl320_id_list.append(dxl_id)
                 self.xl320_id_set.add(dxl_id)
@@ -171,10 +193,7 @@ class AppControllerNode(Node):
 
                 else:
                     self.get_logger().error(f'[ID:{self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Failed to connect.')
-                    self.get_logger().info('Make sure all the servo are connected properly. Terminating.')
-                    
-                    self.destroy_node()
-                    rclpy.shutdown()
+                    self.get_logger().info('Make sure all the servos are connected properly. Terminating.')
                     quit()
 
             elif self.DXL_ID[i] in self.ax12a_id_set:
@@ -189,10 +208,7 @@ class AppControllerNode(Node):
 
                 else:
                     self.get_logger().error(f'[ID:{self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Failed to connect.')
-                    self.get_logger().info('Make sure all the servo are connected properly. Terminating.')
-                    
-                    self.destroy_node()
-                    rclpy.shutdown()
+                    self.get_logger().info('Make sure all the servos are connected properly. Terminating.')
                     quit()
 
             elif self.DXL_ID[i] in self.mx28_id_set:
@@ -207,450 +223,472 @@ class AppControllerNode(Node):
 
                 else:
                     self.get_logger().error(f'[ID:{self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Failed to connect.')
-                    self.get_logger().info('Make sure all the servo are connected properly. Terminating.')
-                    
-                    self.destroy_node()
-                    rclpy.shutdown()
+                    self.get_logger().info('Make sure all the servos are connected properly. Terminating.')
                     quit()
             
 
 
-    def readTorque(self) -> list:
-        ret_val = []
+    def readTorque(self) -> None:
+        ERR_HANDLE_VAL = 2
 
-        for id in self.DXL_ID:
-            if id in self.xl320_id_set:
-                res = self.dxl_controller2.read(
-                    address = DXL_XL320_TORQUE_ENABLE_ADDR,
-                    size    = DXL_XL320_TORQUE_ENABLE_SIZE,
-                    dxl_id  = id
-                )
+        for dxl_id in self.xl320_id_set:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_TORQUE_ENABLE_ADDR,
+                size    = DXL_XL320_TORQUE_ENABLE_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
+            if res >= DXL_OK:
+                self.present_torque[dxl_id] = res
 
-                else:
-                    ret_val.append(2)
+            else:
+                self.present_torque[dxl_id] = ERR_HANDLE_VAL
 
-            elif id in self.ax12a_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_AX12A_TORQUE_ENABLE_ADDR,
-                    size    = DXL_AX12A_TORQUE_ENABLE_SIZE,
-                    dxl_id  = id
-                )
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
+        for dxl_id in self.ax12a_id_set:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_TORQUE_ENABLE_ADDR,
+                size    = DXL_AX12A_TORQUE_ENABLE_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                else:
-                    ret_val.append(2)
+            if res >= DXL_OK:
+                self.present_torque[dxl_id] = res
 
-            elif id in self.mx28_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_MX28_TORQUE_ENABLE_ADDR,
-                    size    = DXL_MX28_TORQUE_ENABLE_SIZE,
-                    dxl_id  = id
-                )
+            else:
+                self.present_torque[dxl_id] = ERR_HANDLE_VAL
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
 
-                else:
-                    ret_val.append(2)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_TORQUE_ENABLE_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_TORQUE_ENABLE_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-        return ret_val
+        for i in range(len(self.mx28_id_list)):
+            self.present_torque[self.mx28_id_list[i]] = res[i]
 
 
 
-    def readPresentPosition(self) -> list:
-        ret_val = []
+    def readPresentPosition(self) -> None:
+        ERR_HANDLE_VAL = 999999
 
-        for id in self.DXL_ID:
-            if id in self.xl320_id_set:
-                res = self.dxl_controller2.read(
-                    address = DXL_XL320_PRESENT_POSITION_ADDR,
-                    size    = DXL_XL320_PRESENT_POSITION_SIZE,
-                    dxl_id  = id
-                )
+        for dxl_id in self.xl320_id_set:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_PRESENT_POSITION_ADDR,
+                size    = DXL_XL320_PRESENT_POSITION_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
+            if res >= DXL_OK:
+                self.present_position[dxl_id] = res
 
-                else:
-                    ret_val.append(999999999)
+            else:
+                self.present_position[dxl_id] = ERR_HANDLE_VAL
 
-            elif id in self.ax12a_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_AX12A_PRESENT_POSITION_ADDR,
-                    size    = DXL_AX12A_PRESENT_POSITION_SIZE,
-                    dxl_id  = id
-                )
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
+        for dxl_id in self.ax12a_id_set:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_PRESENT_POSITION_ADDR,
+                size    = DXL_AX12A_PRESENT_POSITION_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                else:
-                    ret_val.append(999999999)
+            if res >= DXL_OK:
+                self.present_position[dxl_id] = res
 
-            elif id in self.mx28_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_MX28_PRESENT_POSITION_ADDR,
-                    size    = DXL_MX28_PRESENT_POSITION_SIZE,
-                    dxl_id  = id
-                )
+            else:
+                self.present_position[dxl_id] = ERR_HANDLE_VAL
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
 
-                else:
-                    ret_val.append(999999999)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_PRESENT_POSITION_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_PRESENT_POSITION_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-        return ret_val
+        for i in range(len(self.mx28_id_list)):
+            self.present_position[self.mx28_id_list[i]] = res[i]
 
 
 
-    def readPresentSpeed(self) -> list:
-        ret_val = []
+    def readPresentSpeed(self) -> None:
+        ERR_HANDLE_VAL = 999999
 
-        for id in self.DXL_ID:
-            if id in self.xl320_id_set:
-                res = self.dxl_controller2.read(
-                    address = DXL_XL320_PRESENT_SPEED_ADDR,
-                    size    = DXL_XL320_PRESENT_SPEED_SIZE,
-                    dxl_id  = id
-                )
+        for dxl_id in self.xl320_id_set:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_PRESENT_SPEED_ADDR,
+                size    = DXL_XL320_PRESENT_SPEED_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
+            if res >= DXL_OK:
+                self.present_speed[dxl_id] = res
 
-                else:
-                    ret_val.append(999999999)
+            else:
+                self.present_speed[dxl_id] = ERR_HANDLE_VAL
 
-            elif id in self.ax12a_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_AX12A_PRESENT_SPEED_ADDR,
-                    size    = DXL_AX12A_PRESENT_SPEED_SIZE,
-                    dxl_id  = id
-                )
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
+        for dxl_id in self.ax12a_id_set:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_PRESENT_SPEED_ADDR,
+                size    = DXL_AX12A_PRESENT_SPEED_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                else:
-                    ret_val.append(999999999)
+            if res >= DXL_OK:
+                self.present_speed[dxl_id] = res
 
-            elif id in self.mx28_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_MX28_PRESENT_SPEED_ADDR,
-                    size    = DXL_MX28_PRESENT_SPEED_SIZE,
-                    dxl_id  = id
-                )
+            else:
+                self.present_speed[dxl_id] = ERR_HANDLE_VAL
 
-                if res >= DXL_OK:
-                    ret_val.append(res)
 
-                else:
-                    ret_val.append(999999999)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_PRESENT_SPEED_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_PRESENT_SPEED_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-        return ret_val
+        for i in range(len(self.mx28_id_list)):
+            self.present_speed[self.mx28_id_list[i]] = res[i]
 
 
 
-    def readPresentLoad(self) -> list:
-        ret_val = []
+    def readPresentLoad(self) -> None:
+        ERR_HANDLE_VAL  = -99.99
+        XL320_LOAD_CONV = 0.0004
+        AX12A_LOAD_CONV = 0.0015
+        MX28_LOAD_CONV  = 0.0024
 
-        for id in self.DXL_ID:
-            if id in self.xl320_id_set:
-                res = self.dxl_controller2.read(
-                    address = DXL_XL320_PRESENT_LOAD_ADDR,
-                    size    = DXL_XL320_PRESENT_LOAD_SIZE,
-                    dxl_id  = id
-                )
+        for dxl_id in self.xl320_id_set:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_PRESENT_LOAD_ADDR,
+                size    = DXL_XL320_PRESENT_LOAD_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
+            if res >= DXL_OK:
+                self.present_load[dxl_id] = res*XL320_LOAD_CONV if res < 1024 else (1024 - res)*XL320_LOAD_CONV
 
-                else:
-                    ret_val.append(0.0)
+            else:
+                self.present_load[dxl_id] = ERR_HANDLE_VAL
 
-            elif id in self.ax12a_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_AX12A_PRESENT_LOAD_ADDR,
-                    size    = DXL_AX12A_PRESENT_LOAD_SIZE,
-                    dxl_id  = id
-                )
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
+        for dxl_id in self.ax12a_id_set:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_PRESENT_LOAD_ADDR,
+                size    = DXL_AX12A_PRESENT_LOAD_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                else:
-                    ret_val.append(0.0)
+            if res >= DXL_OK:
+                self.present_load[dxl_id] = res*AX12A_LOAD_CONV if res < 1024 else (1024 - res)*AX12A_LOAD_CONV
 
-            elif id in self.mx28_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_MX28_PRESENT_LOAD_ADDR,
-                    size    = DXL_MX28_PRESENT_LOAD_SIZE,
-                    dxl_id  = id
-                )
+            else:
+                self.present_load[dxl_id] = ERR_HANDLE_VAL
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
 
-                else:
-                    ret_val.append(0.0)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_PRESENT_LOAD_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_PRESENT_LOAD_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-        return ret_val
+        for i in range(len(self.mx28_id_list)):
+            self.present_load[self.mx28_id_list[i]] = res[i]*MX28_LOAD_CONV if res[i] < 1024 else (1024 - res[i])*MX28_LOAD_CONV
 
 
 
-    def readPresentVoltage(self) -> list:
-        ret_val = []
+    def readPresentVoltage(self) -> None:
+        ERR_HANDLE_VAL  = -99.99
+        XL320_VOLT_CONV = 0.1
+        AX12A_VOLT_CONV = 0.1
+        MX28_VOLT_CONV  = 0.1
 
-        for id in self.DXL_ID:
-            if id in self.xl320_id_set:
-                res = self.dxl_controller2.read(
-                    address = DXL_XL320_PRESENT_VOLTAGE_ADDR,
-                    size    = DXL_XL320_PRESENT_VOLTAGE_SIZE,
-                    dxl_id  = id
-                )
+        for dxl_id in self.xl320_id_set:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_PRESENT_VOLTAGE_ADDR,
+                size    = DXL_XL320_PRESENT_VOLTAGE_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
+            if res >= DXL_OK:
+                self.present_voltage[dxl_id] = res*XL320_VOLT_CONV
 
-                else:
-                    ret_val.append(0.0)
+            else:
+                self.present_voltage[dxl_id] = ERR_HANDLE_VAL
 
-            elif id in self.ax12a_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_AX12A_PRESENT_VOLTAGE_ADDR,
-                    size    = DXL_AX12A_PRESENT_VOLTAGE_SIZE,
-                    dxl_id  = id
-                )
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
+        for dxl_id in self.ax12a_id_set:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_PRESENT_VOLTAGE_ADDR,
+                size    = DXL_AX12A_PRESENT_VOLTAGE_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                else:
-                    ret_val.append(0.0)
+            if res >= DXL_OK:
+                self.present_voltage[dxl_id] = res*AX12A_VOLT_CONV
 
-            elif id in self.mx28_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_MX28_PRESENT_VOLTAGE_ADDR,
-                    size    = DXL_MX28_PRESENT_VOLTAGE_SIZE,
-                    dxl_id  = id
-                )
+            else:
+                self.present_voltage[dxl_id] = ERR_HANDLE_VAL
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
 
-                else:
-                    ret_val.append(0.0)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_PRESENT_VOLTAGE_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_PRESENT_VOLTAGE_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-        return ret_val
+        for i in range(len(self.mx28_id_list)):
+            self.present_voltage[self.mx28_id_list[i]] = res[i]*MX28_VOLT_CONV
 
 
 
-    def readPresentTemperature(self) -> list:
-        ret_val = []
+    def readPresentTemperature(self) -> None:
+        ERR_HANDLE_VAL  = -99.99
 
-        for id in self.DXL_ID:
-            if id in self.xl320_id_set:
-                res = self.dxl_controller2.read(
-                    address = DXL_XL320_PRESENT_TEMPERATURE_ADDR,
-                    size    = DXL_XL320_PRESENT_TEMPERATURE_SIZE,
-                    dxl_id  = id
-                )
+        for dxl_id in self.xl320_id_set:
+            res = self.dxl_controller2.read(
+                address = DXL_XL320_PRESENT_TEMPERATURE_ADDR,
+                size    = DXL_XL320_PRESENT_TEMPERATURE_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
+            if res >= DXL_OK:
+                self.present_temperature[dxl_id] = float(res)
 
-                else:
-                    ret_val.append(0.0)
+            else:
+                self.present_temperature[dxl_id] = ERR_HANDLE_VAL
 
-            elif id in self.ax12a_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_AX12A_PRESENT_TEMPERATURE_ADDR,
-                    size    = DXL_AX12A_PRESENT_TEMPERATURE_SIZE,
-                    dxl_id  = id
-                )
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
+        for dxl_id in self.ax12a_id_set:
+            res = self.dxl_controller1.read(
+                address = DXL_AX12A_PRESENT_TEMPERATURE_ADDR,
+                size    = DXL_AX12A_PRESENT_TEMPERATURE_SIZE,
+                dxl_id  = dxl_id
+            )
 
-                else:
-                    ret_val.append(0.0)
+            if res >= DXL_OK:
+                self.present_temperature[dxl_id] = float(res)
 
-            elif id in self.mx28_id_set:
-                res = self.dxl_controller1.read(
-                    address = DXL_MX28_PRESENT_TEMPERATURE_ADDR,
-                    size    = DXL_MX28_PRESENT_TEMPERATURE_SIZE,
-                    dxl_id  = id
-                )
+            else:
+                self.present_temperature[dxl_id] = ERR_HANDLE_VAL
 
-                if res >= DXL_OK:
-                    ret_val.append(float(res))
 
-                else:
-                    ret_val.append(0.0)
+        res = self.dxl_controller1.groupBulkRead(
+            address         = [DXL_MX28_PRESENT_TEMPERATURE_ADDR for __ in self.mx28_id_list],
+            size            = [DXL_MX28_PRESENT_TEMPERATURE_SIZE for __ in self.mx28_id_list],
+            dxl_id          = self.mx28_id_list,
+            error_bypass    = True,
+            error_handle_val= ERR_HANDLE_VAL
+        )
 
-        return ret_val
+        for i in range(len(self.mx28_id_list)):
+            self.present_temperature[self.mx28_id_list[i]] = float(res[i])
 
 
 
     def writeTorque(self) -> None:
-        for i in range(self.DXL_NUM):
-            if self.DXL_ID[i] in self.xl320_id_set:
-                res = self.dxl_controller2.write(
-                    address = DXL_XL320_TORQUE_ENABLE_ADDR,
-                    size    = DXL_XL320_TORQUE_ENABLE_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_torque[i]
-                )
+        res = self.dxl_controller2.groupSyncWrite(
+            address = DXL_XL320_TORQUE_ENABLE_ADDR,
+            size    = DXL_XL320_TORQUE_ENABLE_SIZE,
+            dxl_id  = self.xl320_id_list,
+            params  = [[self.goal_torque[dxl_id]] for dxl_id in self.xl320_id_list]
+        )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Write torque failed')
+        if res < DXL_OK:
+            self.get_logger().error('XL320 group sync write torque failed')
 
-            elif self.DXL_ID[i] in self.ax12a_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_AX12A_TORQUE_ENABLE_ADDR,
-                    size    = DXL_AX12A_TORQUE_ENABLE_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_torque[i]
-                )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Write torque failed')
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_AX12A_TORQUE_ENABLE_ADDR,
+            size    = DXL_AX12A_TORQUE_ENABLE_SIZE,
+            dxl_id  = self.ax12a_id_list,
+            params  = [[self.goal_torque[dxl_id]] for dxl_id in self.ax12a_id_list]
+        )
 
-            elif self.DXL_ID[i] in self.mx28_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_MX28_TORQUE_ENABLE_ADDR,
-                    size    = DXL_MX28_TORQUE_ENABLE_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_torque[i]
-                )
+        if res < DXL_OK:
+            self.get_logger().error('AX12A group sync write torque failed')
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Write torque failed')
+
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_MX28_TORQUE_ENABLE_ADDR,
+            size    = DXL_MX28_TORQUE_ENABLE_SIZE,
+            dxl_id  = self.mx28_id_list,
+            params  = [[self.goal_torque[dxl_id]] for dxl_id in self.mx28_id_list]
+        )
+
+        if res < DXL_OK:
+            self.get_logger().error('MX28 group sync write torque failed')
 
 
 
     def writeGoalPosition(self) -> None:
-        for i in range(self.DXL_NUM):
-            if self.DXL_ID[i] in self.xl320_id_set:
-                res = self.dxl_controller2.write(
-                    address = DXL_XL320_GOAL_POSITION_ADDR,
-                    size    = DXL_XL320_GOAL_POSITION_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_position[i]
-                )
+        res = self.dxl_controller2.groupSyncWrite(
+            address = DXL_XL320_GOAL_POSITION_ADDR,
+            size    = DXL_XL320_GOAL_POSITION_SIZE,
+            dxl_id  = self.xl320_id_list,
+            params  = [self.dxl_controller2.convert2ByteToDxl(self.goal_position[dxl_id]) for dxl_id in self.xl320_id_list]
+        )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Write position failed')
+        if res < DXL_OK:
+            self.get_logger().error('XL320 group sync write goal pos. failed')
 
-            elif self.DXL_ID[i] in self.ax12a_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_AX12A_GOAL_POSITION_ADDR,
-                    size    = DXL_AX12A_GOAL_POSITION_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_position[i]
-                )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Write position failed')
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_AX12A_GOAL_POSITION_ADDR,
+            size    = DXL_AX12A_GOAL_POSITION_SIZE,
+            dxl_id  = self.ax12a_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_position[dxl_id]) for dxl_id in self.ax12a_id_list]
+        )
 
-            elif self.DXL_ID[i] in self.mx28_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_MX28_GOAL_POSITION_ADDR,
-                    size    = DXL_MX28_GOAL_POSITION_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_position[i]
-                )
+        if res < DXL_OK:
+            self.get_logger().error('AX12A group sync write goal pos. failed')
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Write position failed')
+
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_MX28_GOAL_POSITION_ADDR,
+            size    = DXL_MX28_GOAL_POSITION_SIZE,
+            dxl_id  = self.mx28_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_position[dxl_id]) for dxl_id in self.mx28_id_list]
+        )
+
+        if res < DXL_OK:
+            self.get_logger().error('MX28 group sync write goal pos. failed')
 
 
 
     def writeGoalSpeed(self) -> None:
-        for i in range(self.DXL_NUM):
-            if self.DXL_ID[i] in self.xl320_id_set:
-                res = self.dxl_controller2.write(
-                    address = DXL_XL320_GOAL_SPEED_ADDR,
-                    size    = DXL_XL320_GOAL_SPEED_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_speed[i]
-                )
+        res = self.dxl_controller2.groupSyncWrite(
+            address = DXL_XL320_GOAL_SPEED_ADDR,
+            size    = DXL_XL320_GOAL_SPEED_SIZE,
+            dxl_id  = self.xl320_id_list,
+            params  = [self.dxl_controller2.convert2ByteToDxl(self.goal_speed[dxl_id]) for dxl_id in self.xl320_id_list]
+        )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.xl320_name[self.DXL_ID[i]]})]: Write speed failed')
+        if res < DXL_OK:
+            self.get_logger().error('XL320 group sync write goal spd. failed')
 
-            elif self.DXL_ID[i] in self.ax12a_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_AX12A_GOAL_SPEED_ADDR,
-                    size    = DXL_AX12A_GOAL_SPEED_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_speed[i]
-                )
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.ax12a_name[self.DXL_ID[i]]})]: Write speed failed')
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_AX12A_GOAL_SPEED_ADDR,
+            size    = DXL_AX12A_GOAL_SPEED_SIZE,
+            dxl_id  = self.ax12a_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_speed[dxl_id]) for dxl_id in self.ax12a_id_list]
+        )
 
-            elif self.DXL_ID[i] in self.mx28_id_set:
-                res = self.dxl_controller1.write(
-                    address = DXL_MX28_GOAL_SPEED_ADDR,
-                    size    = DXL_MX28_GOAL_SPEED_SIZE,
-                    dxl_id  = self.DXL_ID[i],
-                    param   = self.goal_speed[i]
-                )
+        if res < DXL_OK:
+            self.get_logger().error('AX12A group sync write goal spd. failed')
 
-                if res < DXL_OK:
-                    self.get_logger().error(f'[ID: {self.DXL_ID[i]} ({self.mx28_name[self.DXL_ID[i]]})]: Write speed failed')
+
+        res = self.dxl_controller1.groupSyncWrite(
+            address = DXL_MX28_GOAL_SPEED_ADDR,
+            size    = DXL_MX28_GOAL_SPEED_SIZE,
+            dxl_id  = self.mx28_id_list,
+            params  = [self.dxl_controller1.convert2ByteToDxl(self.goal_speed[dxl_id]) for dxl_id in self.mx28_id_list]
+        )
+
+        if res < DXL_OK:
+            self.get_logger().error('MX28 group sync write goal spd. failed')
 
 
 
     def goalTorqueSubCallback(self, msg:adisha_interfaces.JointTorque) -> None:
         self.write_torque   = True
-        self.goal_torque    = msg.val
+        key                 = list(self.goal_torque.keys())
+        for i in range(self.DXL_NUM):
+            self.goal_torque[key[i]] = msg.val[i]
 
 
 
     def goalPositionSubCallback(self, msg:adisha_interfaces.JointPosition) -> None:
         self.write_position = True
-        self.goal_position  = msg.val
+        key                 = list(self.goal_position.keys())
+        for i in range(self.DXL_NUM):
+            self.goal_position[key[i]] = msg.val[i]
 
 
 
     def goalSpeedSubCallback(self, msg:adisha_interfaces.JointVelocity) -> None:
         self.write_speed    = True
-        self.goal_speed     = msg.val
+        key                 = list(self.goal_speed.keys())
+        for i in range(self.DXL_NUM):
+            self.goal_speed[key[i]] = msg.val[i]
+
+
+
+    def featureEnSubCallback(self, msg:adisha_interfaces.FeatureEnable) -> None:
+        self.read_torque    = msg.torque_r
+        self.read_position  = msg.position_r
+        self.read_speed     = msg.speed_r
+        self.read_sensor    = msg.sensor_r
 
 
 
     def controllerTimerCallback(self) -> None:
-        present_torque_msg      = adisha_interfaces.JointTorque()
-        present_position_msg    = adisha_interfaces.JointPosition()
-        present_speed_msg       = adisha_interfaces.JointVelocity()
-        # joint_sensor_msg        = adisha_interfaces.JointSensor()
+        if self.read_torque:
+            self.readTorque()
 
-        present_torque_msg.val      = self.readTorque()
-        present_position_msg.val    = self.readPresentPosition()
-        present_speed_msg.val       = self.readPresentSpeed()
-        # joint_sensor_msg.load           = self.readPresentLoad()
-        # joint_sensor_msg.voltage        = self.readPresentVoltage()
-        # joint_sensor_msg.temperature    = self.readPresentTemperature()
+            present_torque_msg          = adisha_interfaces.JointTorque()
+            present_torque_msg.dxl_id   = list(self.present_torque.keys())
+            present_torque_msg.val      = list(self.present_torque.values())
 
-        self.present_torque_pub.publish(present_torque_msg)
-        self.present_position_pub.publish(present_position_msg)
-        self.present_speed_pub.publish(present_speed_msg)
-        # self.joint_sensor_pub.publish(joint_sensor_msg)
+            self.present_torque_pub.publish(present_torque_msg)
+
+
+        if self.read_position:
+            self.readPresentPosition()
+
+            present_position_msg        = adisha_interfaces.JointPosition()
+            present_position_msg.dxl_id = list(self.present_position.keys())
+            present_position_msg.val    = list(self.present_position.values())
+
+            self.present_position_pub.publish(present_position_msg)
+
+
+        if self.read_speed:
+            self.readPresentSpeed()
+
+            present_speed_msg           = adisha_interfaces.JointVelocity()
+            present_speed_msg.dxl_id    = list(self.present_speed.keys())
+            present_speed_msg.val       = list(self.present_speed.values())
+
+            self.present_speed_pub.publish(present_speed_msg)
+
+
+        if self.read_sensor:
+            self.readPresentLoad()
+            self.readPresentVoltage()
+            self.readPresentTemperature()
+
+            joint_sensor_msg                = adisha_interfaces.JointSensor()
+            joint_sensor_msg.dxl_id         = list(self.present_load.keys())
+            joint_sensor_msg.load           = list(self.present_load.values())
+            joint_sensor_msg.voltage        = list(self.present_voltage.values())
+            joint_sensor_msg.temperature    = list(self.present_temperature.values())
+
+            self.joint_sensor_pub.publish(joint_sensor_msg)
+
 
         if self.write_torque:
             self.write_torque = False
             self.writeTorque()
 
+
         if self.write_position:
             self.write_position = False
             self.writeGoalPosition()
+
 
         if self.write_speed:
             self.write_speed = False

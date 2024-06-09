@@ -102,7 +102,6 @@ class DXLController:
         if dxl_comm_res != dxl.COMM_SUCCESS:
             return DXL_COMM_ERROR
 
-        group_sync_write.clearParam()
         return DXL_OK
 
 
@@ -123,7 +122,8 @@ class DXLController:
         dxl_comm_res = group_sync_read.txRxPacket()
 
         if dxl_comm_res != dxl.COMM_SUCCESS:
-            return DXL_COMM_ERROR
+            if not error_bypass:
+                return DXL_COMM_ERROR
         
         for id in dxl_id:
             dxl_res = group_sync_read.isAvailable(id, address, size)
@@ -163,8 +163,6 @@ class DXLController:
 
         if dxl_comm_res != dxl.COMM_SUCCESS:
             return DXL_COMM_ERROR
-        
-        group_bulk_write.clearParam()
 
 
 
@@ -187,7 +185,8 @@ class DXLController:
         dxl_comm_res = group_bulk_read.txRxPacket()
 
         if dxl_comm_res != dxl.COMM_SUCCESS:
-            return DXL_COMM_ERROR
+            if not error_bypass:
+                return DXL_COMM_ERROR
         
         for i in range(param_num):
             dxl_res = group_bulk_read.isAvailable(dxl_id[i], address[i], size[i])

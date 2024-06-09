@@ -24,9 +24,16 @@ setup(
     tests_require       = ['pytest'],
     entry_points        = {
         'console_scripts': [
+            'dxl_connection_check = adisha_controllers.modules.dxl_type.dxl_connection_check:main',
+            'dxl_torque_enabler = adisha_controllers.modules.dxl_type.dxl_torque_enabler:main',
+            'dxl_torque_disabler = adisha_controllers.modules.dxl_type.dxl_torque_disabler:main',
             '_dummy_app_controller = adisha_controllers._dummy_app_controller:main',
             'app_controller = adisha_controllers.app_controller:main',
-            'motion_player = adisha_controllers.motion_player:main'
+            'motion_player = adisha_controllers.motion_player:main',
+            'button_controller = adisha_controllers.button_controller:main',
+            'mpu6050_controller = adisha_controllers.mpu6050_controller:main',
+            'mpu6050_calibrator = adisha_controllers.mpu6050_calibrator:main',
+            'pose_capture = adisha_controllers.pose_capture:main'
         ],
     },
 )

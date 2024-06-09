@@ -6,6 +6,7 @@ from launch_ros.actions import Node
 
 JOINT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/joint_config.yaml')
 ROBOT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/robot_config.yaml')
+PID_GAINS_PATH      = os.path.join(os.getcwd(), 'src/adisha_data/data/motion_player/pid_gains.yaml')
 
 
 with open(ROBOT_CONFIG_PATH, 'r') as file:
@@ -24,6 +25,13 @@ with open(JOINT_CONFIG_PATH, 'r') as file:
     JOINT_NAME      = JOINT_CONFIG['joint_name']
 
 
+with open(PID_GAINS_PATH, 'r') as file:
+    PID_GAINS   = yaml.safe_load(file)
+    KP_VAL      = PID_GAINS['kp']
+    KI_VAL      = PID_GAINS['ki']
+    KD_VAL      = PID_GAINS['kd']
+
+
 def generate_launch_description():
     
     motion_player_node = Node(
@@ -38,7 +46,10 @@ def generate_launch_description():
             {'dxl_id': DXL_ID},
             {'dxl_type': DXL_TYPE},
             {'joint_name': JOINT_NAME},
-            {'master_clock': MASTER_CLOCK}
+            {'master_clock': MASTER_CLOCK},
+            {'kp_val': KP_VAL},
+            {'ki_val': KI_VAL},
+            {'kd_val': KD_VAL}
         ]
     )
 

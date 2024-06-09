@@ -63,6 +63,15 @@ npm install
 npx generate-ros-messages
 ```
 
+#### **c. Dynamixel SDK Compatibility**
+Adisha team use 3 different type of Dynamixel Servos: XL320 (2.0), AX12A (1.0), and MX28 (1.0). The R/W method compatibility are shown below.
+
+| DXL Type | Sync R | Sync W | Bulk R | Bulk W |
+|:-:|:-:|:-:|:-:|:-:|
+|XL320 (2.0)| NO | **OK** | NO | NO |
+|AX12A (1.0)| NO | **OK** | NO | NO |
+|MX28 (1.0)| NO | **OK** | **OK** | NO |
+
 > [!IMPORTANT]
 >   Use the same node version (20.11.1).
 To ease node version managing, install nvm with:
