@@ -13,7 +13,7 @@ class CombinerUtils(Node):
         self.declare_parameter('id', rclpy.Parameter.Type.STRING)
         self.declare_parameter('dxl_id', rclpy.Parameter.Type.INTEGER_ARRAY)
         self.declare_parameter('dxl_num', rclpy.Parameter.Type.INTEGER)
-        self.declare_parameter('dt_ms', rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter('dt_ms', rclpy.Parameter.Type.INTEGER)
         self.declare_parameter('q_prop', rclpy.Parameter.Type.DOUBLE)
         self.declare_parameter('ps_path', rclpy.Parameter.Type.STRING)
         self.declare_parameter('arm_path', rclpy.Parameter.Type.STRING)
@@ -36,12 +36,6 @@ class CombinerUtils(Node):
 
         self.joint_data = dict(())
 
-        with open(self.ARM_PATH, 'r') as file:
-            self.arm_file = yaml.safe_load(file)['val']
-
-        with open(self.LEG_PATH, 'r') as file:
-            self.leg_file = yaml.safe_load(file)['val']
-
         for dxl_id in self.DXL_ID:
             self.joint_data.update({
                 dxl_id: {
@@ -50,58 +44,71 @@ class CombinerUtils(Node):
                 }
             })
 
+        with open(self.ARM_PATH, 'r') as file:
+            self.arm_file = yaml.safe_load(file)['val']
+
+        with open(self.LEG_PATH, 'r') as file:
+            self.leg_file = yaml.safe_load(file)['val']
 
         for i in range(len(self.arm_file)):
             pose_fn     = self.arm_file[i][0]
             delay       = self.arm_file[i][1]
             duration    = self.arm_file[i][2]
+            init_pose   = True if i == 0 else False
 
             with open(os.path.join(self.PS_PATH, pose_fn), 'r') as file:
                 joint_val = list(yaml.safe_load(file)['val'])
 
             for dxl_id in range(self.ARM_ID[0], self.ARM_ID[1] + 1):
+                if (not init_pose) and (delay > 0):
+                    self.joint_data[dxl_id]['angle'].append(
+                        self.joint_data[dxl_id]['angle'][-1]
+                    )
+                    self.joint_data[dxl_id]['time'].append(
+                        self.joint_data[dxl_id]['time'][-1] + delay
+                    )
+
                 angle_val = joint_val[self.DXL_ID.index(dxl_id)]
                 self.joint_data[dxl_id]['angle'].append(angle_val)
 
-                if i == 0:
+                if init_pose:
                     self.joint_data[dxl_id]['time'].append(0)
 
                 else:
                     self.joint_data[dxl_id]['time'].append(
                         self.joint_data[dxl_id]['time'][-1] + duration
                     )
-
-                if delay > 0:
-                    self.joint_data[dxl_id]['angle'].append(angle_val)
-                    self.joint_data[dxl_id]['time'].append(
-                        self.joint_data[dxl_id]['time'][-1] + delay
-                    )
-
 
         for i in range(len(self.leg_file)):
             pose_fn     = self.leg_file[i][0]
             delay       = self.leg_file[i][1]
             duration    = self.leg_file[i][2]
+            init_pose   = True if i == 0 else False
+
+            if duration <= 0:
+                self.get_logger().warn('Pose duration must be greater than 0')
 
             with open(os.path.join(self.PS_PATH, pose_fn), 'r') as file:
                 joint_val = list(yaml.safe_load(file)['val'])
 
             for dxl_id in range(self.LEG_ID[0], self.LEG_ID[1] + 1):
+                if (not init_pose) and (delay > 0):
+                    self.joint_data[dxl_id]['angle'].append(
+                        self.joint_data[dxl_id]['angle'][-1]
+                    )
+                    self.joint_data[dxl_id]['time'].append(
+                        self.joint_data[dxl_id]['time'][-1] + delay
+                    )
+
                 angle_val = joint_val[self.DXL_ID.index(dxl_id)]
                 self.joint_data[dxl_id]['angle'].append(angle_val)
 
-                if i == 0:
+                if init_pose:
                     self.joint_data[dxl_id]['time'].append(0)
 
                 else:
                     self.joint_data[dxl_id]['time'].append(
                         self.joint_data[dxl_id]['time'][-1] + duration
-                    )
-
-                if delay > 0:
-                    self.joint_data[dxl_id]['angle'].append(angle_val)
-                    self.joint_data[dxl_id]['time'].append(
-                        self.joint_data[dxl_id]['time'][-1] + delay
                     )
 
 
@@ -126,7 +133,7 @@ class CombinerUtils(Node):
         if len(angle) != len(time_ms): raise Exception('"angle" and "time" lists length must be the same')
 
         num_data    = len(angle)
-        timestamp   = np.arange(time_ms[0], time_ms[-1], dt_ms)
+        timestamp   = np.arange(time_ms[0], time_ms[-1], dt_ms, dtype=int).tolist()
         tau_plus    = []
         tau_min     = []
 
@@ -149,10 +156,10 @@ class CombinerUtils(Node):
             )
 
             angle_res.append(
-                ((1.0 - s_val)**3.0)*angle[idx - 1] + 
+                int(np.round(((1.0 - s_val)**3.0)*angle[idx - 1] + 
                 (3.0*s_val*(1.0 - s_val)**2.0)*angle[idx - 1] + 
                 (3.0*(s_val**2.0)*(1.0 - s_val))*angle[idx] + 
-                (s_val**3.0)*angle[idx]
+                (s_val**3.0)*angle[idx]))
             )
 
         return angle_res, timestamp
@@ -160,7 +167,7 @@ class CombinerUtils(Node):
 
 
     def executeCombiner(self) -> None:
-        result_data = dict(())
+        result_data = {'dt_ms': self.DT_MS}
         
         for dxl_id in self.DXL_ID:
             angle_data, time_data = self.bezierInterpolate(
@@ -172,8 +179,8 @@ class CombinerUtils(Node):
 
             result_data.update({
                 dxl_id: {
-                    'angle': angle_data,
-                    'time': time_data
+                    'angle': angle_data.copy(),
+                    'time': time_data.copy()
                 }
             })
 
