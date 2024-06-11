@@ -18,9 +18,9 @@ class MotionPlayerNode(Node):
         self.declare_parameter('dxl_type', rclpy.Parameter.Type.STRING_ARRAY)
         self.declare_parameter('joint_name', rclpy.Parameter.Type.STRING_ARRAY)
         self.declare_parameter('master_clock', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('kp_val', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('ki_val', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('kd_val', rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter('tracker_kp', rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter('tracker_ki', rclpy.Parameter.Type.DOUBLE)
+        self.declare_parameter('tracker_kd', rclpy.Parameter.Type.DOUBLE)
 
         self.ID             = self.get_parameter('id').value
         self.DXL_BAUDRATE   = self.get_parameter('dxl_baudrate').value
@@ -30,9 +30,9 @@ class MotionPlayerNode(Node):
         self.DXL_TYPE       = self.get_parameter('dxl_type').value
         self.JOINT_NAME     = self.get_parameter('joint_name').value
         self.MASTER_CLOCK   = self.get_parameter('master_clock').value
-        self.KP_VAL         = self.get_parameter('kp_val').value
-        self.KI_VAL         = self.get_parameter('ki_val').value
-        self.KD_VAL         = self.get_parameter('kd_val').value
+        self.TRACKER_KP     = self.get_parameter('tracker_kp').value
+        self.TRACKER_KI     = self.get_parameter('tracker_ki').value
+        self.TRACKER_KD     = self.get_parameter('tracker_kd').value
 
         self.xl320_id_list  = []
         self.xl320_id_set   = set(())
@@ -85,6 +85,13 @@ class MotionPlayerNode(Node):
             msg_type    = adisha_interfaces.JointPosition,
             topic       = f'{self.ID}/goal_position',
             callback    = self.goalPositionSubCallback,
+            qos_profile = 1000
+        )
+
+        self.goal_speed_sub = self.create_subscription(
+            msg_type    = adisha_interfaces.JointVelocity,
+            topic       = f'{self.ID}/goal_speed',
+            callback    = self.goalSpeedSubCallback,
             qos_profile = 1000
         )
 
@@ -325,8 +332,14 @@ class MotionPlayerNode(Node):
 
 
 
+    def goalSpeedSubCallback(self, msg:adisha_interfaces.JointVelocity) -> None:
+        for i in range(len(msg.dxl_id)):
+            self.goal_speed[msg.dxl_id[i]] = msg.val[i]
+
+
+
     def playerTimerCallback(self) -> None:
-        self.readPresentPosition()
-        self.goal_position = self.present_position.copy()
+        # self.readPresentPosition()
+        # self.goal_position = self.present_position.copy()
         self.writeGoalSpeed()
         self.writeGoalPosition()

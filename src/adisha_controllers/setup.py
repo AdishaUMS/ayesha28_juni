@@ -30,6 +30,7 @@ setup(
             '_dummy_app_controller = adisha_controllers._dummy_app_controller:main',
             'app_controller = adisha_controllers.app_controller:main',
             'motion_player = adisha_controllers.motion_player:main',
+            'motion_setter = adisha_controllers.motion_setter:main',
             'button_controller = adisha_controllers.button_controller:main',
             'mpu6050_controller = adisha_controllers.mpu6050_controller:main',
             'mpu6050_calibrator = adisha_controllers.mpu6050_calibrator:main',
