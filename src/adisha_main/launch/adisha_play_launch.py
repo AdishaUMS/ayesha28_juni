@@ -62,6 +62,8 @@ def generate_launch_description():
         name        = f'{ROBOT_ID}_motion_setter',
         parameters  = [
             {'id': ROBOT_ID},
+            {'dxl_num': DXL_NUM},
+            {'dxl_id': DXL_ID},
             {'master_clock': MASTER_CLOCK},
             {'motion_path': SELECTED_MOTION_PATH},
             {'stabler_kp': TRACKER_KP},
