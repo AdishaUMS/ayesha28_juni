@@ -1,4 +1,70 @@
-function on_click_pose(fname) {
+function onload_update() {
+    var torque_en = []
+
+    for(let i = 0; i < ADISHA_DXL_NUM; i++) {
+        torque_en.push(0)
+    }
+
+    fetch(`${ADISHA_URL}/api/set_torque`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({goal_torque: torque_en})
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+    for(let i = 0; i < ADISHA_DXL_NUM; i++) {
+        let tpos_element = document.getElementById(`tpos_${ADISHA_DXL_ID[i]}`)
+
+        tpos_element.addEventListener('keydown', (event) => {
+            if(event.key == 'ArrowUp') {
+                tpos_element.value = parseInt(tpos_element.value, 10) + 1
+            }
+            else if(event.key == 'ArrowDown') {
+                tpos_element.value = parseInt(tpos_element.value, 10) - 1
+            }
+            if(event.key == 'ArrowUp' || event.key == 'ArrowDown') {
+                let goal_pos = []
+        
+                for(let i = 0; i < ADISHA_DXL_NUM; i++) {
+                    let val = parseInt(document.getElementById(`tpos_${ADISHA_DXL_ID[i]}`).value, 10)
+                    goal_pos.push(val)
+                }
+                
+                fetch(`${ADISHA_URL}/api/set_position`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        goal_position: goal_pos
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error: ', error);
+                    });
+            }
+        })
+    }
+
+    document.getElementById('filename_entry').addEventListener('keypress', (event) => {
+        if(event.key == 'Enter') {
+            event.preventDefault()
+            save_pose()
+        }
+    })
+}
+
+
+
+function onclick_pose(fname) {
     fetch(`${ADISHA_URL}/api/get_pose_value`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -21,7 +87,8 @@ function on_click_pose(fname) {
 }
 
 
-function show_saved_poses() {
+
+function button_show_saved_poses() {
     fetch(`${ADISHA_URL}/api/get_saved_poses`)
         .then(response => {
             if(!response.ok) {
@@ -48,7 +115,7 @@ function show_saved_poses() {
                     file.className  = 'px-20 py-3 font-medium text-white'
 
                     item.addEventListener('click', () => {
-                        on_click_pose(poses[i])
+                        onclick_pose(poses[i])
                     })
 
                     no.innerHTML    = `${i + 1}`
@@ -82,13 +149,15 @@ function show_saved_poses() {
 }
 
 
-function show_save_prompt() {
+
+function button_show_save_prompt() {
     document.getElementById('filename_overlay').classList.remove('hidden')
     document.getElementById('filename').classList.remove('hidden')
 }
 
 
-function play_pose() {
+
+function button_play_pose() {
     for(let i = 0; i < ADISHA_DXL_NUM; i++) {
         document.getElementById(`tpos_${ADISHA_DXL_ID[i]}`).value = document.getElementById(`spos_${ADISHA_DXL_ID[i]}`).innerText
     }
@@ -117,21 +186,24 @@ function play_pose() {
 }
 
 
-function enable_all_torque() {
+
+function button_enable_all_torque() {
     for(let i = 0; i < ADISHA_DXL_NUM; i++) {
         document.getElementById(`torque_en_${ADISHA_DXL_ID[i]}`).checked = true    
     }
 }
 
 
-function disable_all_torque() {
+
+function button_disable_all_torque() {
     for(let i = 0; i < ADISHA_DXL_NUM; i++) {
         document.getElementById(`torque_en_${ADISHA_DXL_ID[i]}`).checked = false
     }
 }
 
 
-function apply_torque() {
+
+function button_apply_torque() {
     var torque_en           = []
     var check_num           = 0
     let play_pose_button    = document.getElementById("play_pose_button")
@@ -180,3 +252,72 @@ function apply_torque() {
             console.error('Error:', error);
         });
 }
+
+
+
+function cancel_saved_pose() {
+    document.getElementById("pose_select_overlay").classList.add("hidden");
+    document.getElementById("pose_select").classList.add("hidden");
+}
+
+
+
+function save_pose() {
+    var file_name   = document.getElementById("filename_entry").value
+    var pres_pos    = []
+
+    for(let i = 0; i < ADISHA_DXL_NUM; i++) {
+        let val = parseInt(document.getElementById(`pos_${ADISHA_DXL_ID[i]}`).innerHTML, 10)
+        pres_pos.push(val)
+        document.getElementById(`spos_${ADISHA_DXL_ID[i]}`).innerHTML = val
+    }
+
+    fetch(`${ADISHA_URL}/api/save_pose`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            filename: file_name,
+            val: pres_pos
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+        });
+
+    
+    document.getElementById("filename_overlay").classList.add("hidden");
+    document.getElementById("filename").classList.add("hidden");
+}
+
+
+
+function cancel_save_pose() {
+    document.getElementById("filename_overlay").classList.add("hidden");
+    document.getElementById("filename").classList.add("hidden");
+}
+
+
+
+function status_table_update() {
+    fetch(`${ADISHA_URL}/api/get_status`)
+        .then(response => {
+            if(!response.ok) {
+                throw new Error(`Bad response from ${ADISHA_URL}/api/get_status`)
+            }
+            return response.json()
+        })
+        .then(data => {
+            for(let i = 0; i < ADISHA_DXL_NUM; i++) {
+                document.getElementById(`pos_${ADISHA_DXL_ID[i]}`).innerHTML = data.present_position[i]
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error)
+        })
+}
+
+setInterval(status_table_update, ADISHA_MASTER_CLOCK_MS)

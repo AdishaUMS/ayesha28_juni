@@ -61,6 +61,7 @@ function on_create_pose(idx, fname) {
 }
 
 
+
 function on_delete_pose(idx) {
     var parent  = document.getElementById('sequencer_list')
     let dly_tmp = []
@@ -111,6 +112,7 @@ function on_delete_pose(idx) {
 }
 
 
+
 function on_click_pose(fname) {
     on_create_pose(pose_cnt, fname)
 
@@ -121,6 +123,7 @@ function on_click_pose(fname) {
         document.getElementById('table_init').classList.add('hidden')
     }
 }
+
 
 
 function reset_motion() {
@@ -157,6 +160,7 @@ function reset_motion() {
         pose_list   = []
     }
 }
+
 
 
 function on_click_motion(fname) {
@@ -220,6 +224,7 @@ function on_click_motion(fname) {
 }
 
 
+
 function open_saved_motions() {
     fetch(`${ADISHA_URL}/api/get_saved_motions`)
         .then(response => {
@@ -281,12 +286,116 @@ function open_saved_motions() {
 }
 
 
+
 function show_save_prompt() {
     document.getElementById('filename_overlay').classList.remove('hidden')
     document.getElementById('filename').classList.remove('hidden')
 }
 
 
+
 function play_motion() {
 
+}
+
+
+
+function cancel_saved_motion() {
+    document.getElementById("motion_select_overlay").classList.add("hidden");
+    document.getElementById("motion_select").classList.add("hidden");
+}
+
+
+
+function save_motion() {
+    var file_name   = document.getElementById("filename_entry").value
+    var seq_list    = []
+
+    if(pose_cnt == 0) {
+        return
+    }
+
+    for(let i = 0; i < pose_cnt; i++) {
+        let seq = []
+
+        seq.push(document.getElementById(`pose_name_${i}`).innerText)
+        seq.push(parseInt(document.getElementById(`dly_${i}`).value, 10))
+        seq.push(parseInt(document.getElementById(`dtn_${i}`).value, 10))
+
+        seq_list.push(seq)
+    }
+
+    fetch(`${ADISHA_URL}/api/save_motion`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            filename: file_name,
+            val: seq_list
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+        });
+
+    
+    document.getElementById("filename_overlay").classList.add("hidden");
+    document.getElementById("filename").classList.add("hidden");
+}
+
+
+
+function cancel_save_motion() {
+    document.getElementById("filename_overlay").classList.add("hidden");
+    document.getElementById("filename").classList.add("hidden");
+}
+
+
+
+function onload_update() {
+    fetch(`${ADISHA_URL}/api/get_saved_poses`)
+        .then(response => {
+            if(!response.ok) {
+                throw new Error(`Bad response from ${ADISHA_URL}/api/get_saved_poses`)
+            }
+            return response.json()
+        })
+        .then(data => {
+            var poses   = data.poses
+            var parent  = document.getElementById('pose_item')
+
+            if(poses.length != 0) {
+                
+                while(parent.firstChild) {
+                    parent.removeChild(parent.firstChild)
+                }
+
+                for(let i = 0; i < poses.length; i++) {
+                    let item    = document.createElement('tr')
+                    let no      = document.createElement('th')
+                    let file    = document.createElement('td')
+
+                    item.className  = 'bg-gray-800 border-b border-gray-700 hover:bg-gray-600'
+                    no.className    = 'px-3 py-3 font-medium text-white whitespace-nowrap'
+                    file.className  = 'px-20 py-3 font-medium text-white'
+
+                    item.addEventListener('click', () => {
+                        on_click_pose(poses[i])
+                    })
+
+                    no.innerHTML    = `${i + 1}`
+                    file.innerHTML  = `${poses[i]}`
+
+                    item.appendChild(no)
+                    item.appendChild(file)
+                    parent.appendChild(item)
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error)
+        })
 }
