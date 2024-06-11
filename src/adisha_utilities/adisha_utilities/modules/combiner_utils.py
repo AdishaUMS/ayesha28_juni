@@ -230,6 +230,10 @@ class CombinerUtils(Node):
                 dxl_type    = self.DXL_TYPE[i]
             )
 
+            if i == 0:
+                points_num = len(angle_data)
+                result_data.update({'points_num': points_num})
+
             result_data.update({
                 self.DXL_ID[i]: {
                     'angle': angle_data.copy(),
