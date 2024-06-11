@@ -13,6 +13,7 @@ class CombinerUtils(Node):
         self.declare_parameter('id', rclpy.Parameter.Type.STRING)
         self.declare_parameter('dxl_id', rclpy.Parameter.Type.INTEGER_ARRAY)
         self.declare_parameter('dxl_num', rclpy.Parameter.Type.INTEGER)
+        self.declare_parameter('dxl_type', rclpy.Parameter.Type.STRING_ARRAY)
         self.declare_parameter('dt_ms', rclpy.Parameter.Type.INTEGER)
         self.declare_parameter('q_prop', rclpy.Parameter.Type.DOUBLE)
         self.declare_parameter('ps_path', rclpy.Parameter.Type.STRING)
@@ -25,6 +26,7 @@ class CombinerUtils(Node):
         self.ID             = self.get_parameter('id').value
         self.DXL_ID         = self.get_parameter('dxl_id').value
         self.DXL_NUM        = self.get_parameter('dxl_num').value
+        self.DXL_TYPE       = self.get_parameter('dxl_type').value
         self.DT_MS          = self.get_parameter('dt_ms').value
         self.Q_PROP         = self.get_parameter('q_prop').value
         self.PS_PATH        = self.get_parameter('ps_path').value
@@ -143,6 +145,7 @@ class CombinerUtils(Node):
             tau_min.append(time_ms[i - 1] + (time_ms[i] - time_ms[i - 1])*(1.0 - q_proportion))
 
         angle_res   = []
+        speed_res   = []
         idx         = 1
         for t in timestamp:
             if t > time_ms[idx]: idx += 1
@@ -166,21 +169,72 @@ class CombinerUtils(Node):
     
 
 
+    def calculateSpeed(self, angle:list, time_ms:list, dxl_type:str) -> list:
+        XL320_DPB       = 0.29
+        AX12A_DPB       = 0.29
+        MX28_DPB        = 0.088
+        XL320_DPSPB     = 0.666
+        AX12A_DPSPB     = 0.666
+        MX28_DPSPB      = 0.684
+        XL320_SPEED_MAX = 1023
+        AX12A_SPEED_MAX = 1023
+        MX28_SPEED_MAX  = 1023
+
+        data_len    = len(angle)
+        speed_res   = []
+
+        for i in range(data_len):
+            if i == 0:
+                speed_res.append(512)
+                continue
+
+            if dxl_type == 'XL320':
+                DPB_CONST   = XL320_DPB
+                DPSPB_CONST = XL320_DPSPB
+                MAX_CONST   = XL320_SPEED_MAX
+            elif dxl_type == 'AX12A':
+                DPB_CONST   = AX12A_DPB
+                DPSPB_CONST = AX12A_DPSPB
+                MAX_CONST   = AX12A_SPEED_MAX
+            elif dxl_type == 'MX28':
+                DPB_CONST   = MX28_DPB
+                DPSPB_CONST = MX28_DPSPB
+                MAX_CONST   = MX28_SPEED_MAX
+
+            angle_dist  = float(np.abs(angle[i] - angle[i - 1]))*DPB_CONST
+            target_time = time_ms[i]*1e-3
+            omega       = angle_dist/target_time
+            angle_speed = int(np.round(omega/DPSPB_CONST))
+            if angle_speed > MAX_CONST: angle_speed = MAX_CONST
+
+            speed_res.append(angle_speed)
+
+        return speed_res
+
+
+
     def executeCombiner(self) -> None:
         result_data = {'dt_ms': self.DT_MS}
         
-        for dxl_id in self.DXL_ID:
+        for i in range(self.DXL_NUM):
             angle_data, time_data = self.bezierInterpolate(
-                angle           = self.joint_data[dxl_id]['angle'],
-                time_ms         = self.joint_data[dxl_id]['time'],
+                angle           = self.joint_data[self.DXL_ID[i]]['angle'],
+                time_ms         = self.joint_data[self.DXL_ID[i]]['time'],
                 q_proportion    = self.Q_PROP,
                 dt_ms           = self.DT_MS
             )
 
+            speed_data = self.calculateSpeed(
+                angle       = angle_data,
+                time_ms     = time_data,
+                dxl_type    = self.DXL_TYPE[i]
+            )
+
             result_data.update({
-                dxl_id: {
+                self.DXL_ID[i]: {
                     'angle': angle_data.copy(),
-                    'time': time_data.copy()
+                    'time': time_data.copy(),
+                    'speed': speed_data.copy()
                 }
             })
 
