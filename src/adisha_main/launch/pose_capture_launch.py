@@ -7,7 +7,7 @@ from launch_ros.actions import Node
 JOINT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/joint_config.yaml')
 ROBOT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/robot_config.yaml')
 POSE_CAPTURE_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/data/pose_capture')
-PC_CONFIG_PATH      = os.path.join(os.getcwd(), 'src/adisha_data/data/pose_capture/config.yaml')
+PC_PARAMS_PATH      = os.path.join(os.getcwd(), 'src/adisha_data/launch_params/pose_capture.yaml')
 
 
 with open(ROBOT_CONFIG_PATH, 'r') as file:
@@ -26,7 +26,7 @@ with open(JOINT_CONFIG_PATH, 'r') as file:
     JOINT_NAME      = JOINT_CONFIG['joint_name']
 
 
-with open(PC_CONFIG_PATH, 'r') as file:
+with open(PC_PARAMS_PATH, 'r') as file:
     PC_CONFIG       = yaml.safe_load(file)
     FILENAME        = PC_CONFIG['filename']
     TORQUE_ENABLE   = PC_CONFIG['torque_enable']

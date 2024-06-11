@@ -6,7 +6,7 @@ from launch_ros.actions import Node
 
 JOINT_CONFIG_PATH       = os.path.join(os.getcwd(), 'src/adisha_data/config/joint_config.yaml')
 ROBOT_CONFIG_PATH       = os.path.join(os.getcwd(), 'src/adisha_data/config/robot_config.yaml')
-COMBINER_CONFIG_PATH    = os.path.join(os.getcwd(), 'src/adisha_data/data/motion/combiner_config.yaml')
+COMBINER_PARAMS_PATH    = os.path.join(os.getcwd(), 'src/adisha_data/launch_params/combiner.yaml')
 MOTSEQ_PATH             = os.path.join(os.getcwd(), 'src/adisha_data/data/app_motion_sequencer')
 POSE_STUDIO_PATH        = os.path.join(os.getcwd(), 'src/adisha_data/data/app_pose_studio')
 OUTPUT_PATH             = os.path.join(os.getcwd(), 'src/adisha_data/data/motion')
@@ -19,11 +19,12 @@ with open(ROBOT_CONFIG_PATH, 'r') as file:
 
 with open(JOINT_CONFIG_PATH, 'r') as file:
     JOINT_CONFIG    = yaml.safe_load(file)
-    DXL_ID          = JOINT_CONFIG['dxl_id']
     DXL_NUM         = JOINT_CONFIG['dxl_num']
+    DXL_ID          = JOINT_CONFIG['dxl_id']
+    DXL_TYPE        = JOINT_CONFIG['dxl_type']
 
 
-with open(COMBINER_CONFIG_PATH, 'r') as file:
+with open(COMBINER_PARAMS_PATH, 'r') as file:
     COMBINER_CONFIG = yaml.safe_load(file)
     OUTPUT_PATH     = os.path.join(OUTPUT_PATH, COMBINER_CONFIG['output_filename'])
     ARM_FILENAME    = os.path.join(MOTSEQ_PATH, COMBINER_CONFIG['arm'])
@@ -42,6 +43,7 @@ def generate_launch_description():
             {'id': ROBOT_ID},
             {'dxl_id': DXL_ID},
             {'dxl_num': DXL_NUM},
+            {'dxl_type': DXL_TYPE},
             {'dt_ms': DT_MS},
             {'q_prop': Q_PROP},
             {'ps_path': POSE_STUDIO_PATH},
