@@ -56,6 +56,17 @@ def generate_launch_description():
         ]
     )
 
+    button_controller_node = Node(
+        package     = 'adisha_controllers',
+        executable  = 'button_controller',
+        name        = f'{ROBOT_ID}_button_controller',
+        parameters  = [
+            {'id': ROBOT_ID},
+            {'master_clock': MASTER_CLOCK},
+            {'input_pin': [16, 26]}
+        ]
+    )
+
     motion_setter_node = Node(
         package     = 'adisha_controllers',
         executable  = 'motion_setter',
@@ -93,6 +104,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         mpu6050_controller_node,
+        button_controller_node,
         motion_setter_node,
         motion_player_node
     ])
