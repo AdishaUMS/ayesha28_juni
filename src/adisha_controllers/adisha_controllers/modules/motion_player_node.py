@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from .dxl_type.dxl_controller import *
 import adisha_interfaces.msg as adisha_interfaces
-import time 
+import threading
 
 
 
@@ -81,6 +81,8 @@ class MotionPlayerNode(Node):
             self.packethandler2
         )
 
+        self.dxl_write_mutex = threading.Lock()
+
         self.goal_position_sub = self.create_subscription(
             msg_type    = adisha_interfaces.JointPosition,
             topic       = f'{self.ID}/goal_position',
@@ -93,11 +95,6 @@ class MotionPlayerNode(Node):
             topic       = f'{self.ID}/goal_speed',
             callback    = self.goalSpeedSubCallback,
             qos_profile = 1000
-        )
-
-        self.player_timer = self.create_timer(
-            0.3,
-            self.playerTimerCallback
         )
 
 
@@ -330,16 +327,14 @@ class MotionPlayerNode(Node):
         for i in range(len(msg.dxl_id)):
             self.goal_position[msg.dxl_id[i]] = msg.val[i]
 
+        with self.dxl_write_mutex:
+            self.writeGoalPosition()
+
 
 
     def goalSpeedSubCallback(self, msg:adisha_interfaces.JointVelocity) -> None:
         for i in range(len(msg.dxl_id)):
             self.goal_speed[msg.dxl_id[i]] = msg.val[i]
 
-
-
-    def playerTimerCallback(self) -> None:
-        # self.readPresentPosition()
-        # self.goal_position = self.present_position.copy()
-        self.writeGoalSpeed()
-        self.writeGoalPosition()
+        with self.dxl_write_mutex:
+            self.writeGoalSpeed()

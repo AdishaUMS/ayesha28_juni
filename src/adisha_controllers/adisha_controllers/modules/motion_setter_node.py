@@ -83,6 +83,11 @@ class MotionSetterNode(Node):
 
 
 
+    def inertialFeedback(self) -> None:
+        pass
+
+
+
     def inertialSubCallback(self, msg:adisha_interfaces.Inertial) -> None:
         self.imu_roll   = msg.roll
         self.imu_pitch  = msg.pitch
