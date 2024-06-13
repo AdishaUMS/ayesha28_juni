@@ -169,7 +169,7 @@ class CombinerUtils(Node):
     
 
 
-    def calculateSpeed(self, angle:list, time_ms:list, dxl_type:str) -> list:
+    def calculateSpeed(self, angle:list, dt_ms:float, dxl_type:str) -> list:
         XL320_DPB       = 0.29
         AX12A_DPB       = 0.29
         MX28_DPB        = 0.088
@@ -202,7 +202,7 @@ class CombinerUtils(Node):
                 MAX_CONST   = MX28_SPEED_MAX
 
             angle_dist  = float(np.abs(angle[i] - angle[i - 1]))*DPB_CONST
-            target_time = time_ms[i]*1e-3
+            target_time = dt_ms*1e-3
             omega       = angle_dist/target_time
             angle_speed = int(np.round(omega/DPSPB_CONST))
             if angle_speed > MAX_CONST: angle_speed = MAX_CONST
@@ -221,12 +221,12 @@ class CombinerUtils(Node):
                 angle           = self.joint_data[self.DXL_ID[i]]['angle'],
                 time_ms         = self.joint_data[self.DXL_ID[i]]['time'],
                 q_proportion    = self.Q_PROP,
-                dt_ms           = self.DT_MS
+                dt_ms           = float(self.DT_MS)
             )
 
             speed_data = self.calculateSpeed(
                 angle       = angle_data,
-                time_ms     = time_data,
+                time_ms     = float(self.DT_MS),
                 dxl_type    = self.DXL_TYPE[i]
             )
 
