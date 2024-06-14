@@ -7,6 +7,7 @@ from launch_ros.actions import Node
 JOINT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/joint_config.yaml')
 ROBOT_CONFIG_PATH   = os.path.join(os.getcwd(), 'src/adisha_data/config/robot_config.yaml')
 CTRL_CONFIG_PATH    = os.path.join(os.getcwd(), 'src/adisha_data/config/controller_config.yaml')
+CALIB_DATA_PATH     = os.path.join(os.getcwd(), 'src/adisha_data/data/calibration/mpu6050.yaml')
 PLAY_PARAMS_PATH    = os.path.join(os.getcwd(), 'src/adisha_data/launch_params/adisha_play.yaml')
 MOTION_PATH         = os.path.join(os.getcwd(), 'src/adisha_data/data/motion')
 
@@ -52,7 +53,7 @@ def generate_launch_description():
             {'id': ROBOT_ID},
             {'imu_period': MASTER_CLOCK},
             {'sample_num': -1},
-            {'calib_data_path': "__"}
+            {'calib_data_path': CALIB_DATA_PATH}
         ]
     )
 
