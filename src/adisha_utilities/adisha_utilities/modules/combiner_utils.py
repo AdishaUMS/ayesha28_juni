@@ -214,7 +214,9 @@ class CombinerUtils(Node):
 
 
     def executeCombiner(self) -> None:
-        result_data = {'dt_ms': self.DT_MS}
+        result_data     = {'dt_ms': self.DT_MS}
+        arm_data_len    = 0
+        leg_data_len    = 0
         
         for i in range(self.DXL_NUM):
             angle_data, time_data = self.bezierInterpolate(
@@ -226,13 +228,15 @@ class CombinerUtils(Node):
 
             speed_data = self.calculateSpeed(
                 angle       = angle_data,
-                time_ms     = float(self.DT_MS),
+                dt_ms       = float(self.DT_MS),
                 dxl_type    = self.DXL_TYPE[i]
             )
 
-            if i == 0:
-                points_num = len(angle_data)
-                result_data.update({'points_num': points_num})
+            if self.DXL_ID[i] == self.ARM_ID[0]:
+                arm_data_len = len(angle_data)
+
+            if self.DXL_ID[i] == self.LEG_ID[0]:
+                leg_data_len = len(angle_data)
 
             result_data.update({
                 self.DXL_ID[i]: {
@@ -241,6 +245,9 @@ class CombinerUtils(Node):
                     'speed': speed_data.copy()
                 }
             })
+
+        points_num = arm_data_len if arm_data_len < leg_data_len else leg_data_len
+        result_data.update({'points_num': points_num})
 
         with open(self.OUTPUT_PATH, 'w') as file:
             yaml.safe_dump(result_data, file)
