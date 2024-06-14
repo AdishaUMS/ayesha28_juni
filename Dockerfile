@@ -69,6 +69,7 @@ RUN apt-get update && \
     numpy \
     pyyaml \
     RPi.GPIO \
+    smbus2 \
     && \
     apt-get remove -y pip
 
