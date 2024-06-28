@@ -1,0 +1,232 @@
+val:
+  - - 1_18.yaml
+    - 50
+    - 600
+  - - 2_18.yaml
+    - 50
+    - 600
+  - - 3_18.yaml
+    - 50
+    - 600
+  - - 4_18.yaml
+    - 50
+    - 600
+  - - 5_18.yaml
+    - 50
+    - 600
+  - - 7_18.yaml
+    - 50
+    - 800
+  - - 8_18.yaml
+    - 50
+    - 600
+  - - 9_24.yaml
+    - 50
+    - 600
+  - - 10_24.yaml
+    - 50
+    - 600
+  - - 11_19.yaml
+    - 50
+    - 600
+  - - 12_18.yaml
+    - 50
+    - 600
+  - - 13_18.yaml
+    - 50
+    - 800
+  - - 14_18.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_18.yaml
+    - 50
+    - 600
+  - - 17_18.yaml
+    - 50
+    - 600
+  - - 6_18.yaml
+    - 50
+    - 600
+  - - 7_18.yaml
+    - 50
+    - 800
+  - - 8_18.yaml
+    - 50
+    - 600
+  - - 9_24.yaml
+    - 50
+    - 600
+  - - 10_24.yaml
+    - 50
+    - 600
+  - - 11_19.yaml
+    - 50
+    - 600
+  - - 12_18.yaml
+    - 50
+    - 600
+  - - 13_18.yaml
+    - 50
+    - 800
+  - - 14_18.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_18.yaml
+    - 50
+    - 600
+  - - 17_18.yaml
+    - 50
+    - 600
+  - - 6_18.yaml
+    - 50
+    - 600
+  - - 7_18.yaml
+    - 50
+    - 800
+  - - 8_18.yaml
+    - 50
+    - 600
+  - - 9_24.yaml
+    - 50
+    - 600
+  - - 10_24.yaml
+    - 50
+    - 600
+  - - 11_19.yaml
+    - 50
+    - 600
+  - - 12_18.yaml
+    - 50
+    - 600
+  - - 13_18.yaml
+    - 50
+    - 800
+  - - 14_18.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_18.yaml
+    - 50
+    - 600
+  - - 17_18.yaml
+    - 50
+    - 600
+  - - 6_18.yaml
+    - 50
+    - 600
+  - - 7_18.yaml
+    - 50
+    - 800
+  - - 8_18.yaml
+    - 50
+    - 600
+  - - 9_24.yaml
+    - 50
+    - 600
+  - - 10_24.yaml
+    - 50
+    - 600
+  - - 11_19.yaml
+    - 50
+    - 600
+  - - 12_18.yaml
+    - 50
+    - 600
+  - - 13_18.yaml
+    - 50
+    - 800
+  - - 14_18.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_18.yaml
+    - 50
+    - 600
+  - - 17_18.yaml
+    - 50
+    - 600
+  - - 6_18.yaml
+    - 50
+    - 600
+  - - 7_18.yaml
+    - 50
+    - 800
+  - - 8_18.yaml
+    - 50
+    - 600
+  - - 9_24.yaml
+    - 50
+    - 600
+  - - 10_24.yaml
+    - 50
+    - 600
+  - - 11_19.yaml
+    - 50
+    - 600
+  - - 12_18.yaml
+    - 50
+    - 600
+  - - 13_18.yaml
+    - 50
+    - 800
+  - - awal1_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - awal2_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - awal3_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - mungkah_lawang_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kananv2_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - lukanagasataru_kanan_1v2.yaml
+    - 50
+    - 1000
+  - - lukanagasataru_kanan_2v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_3v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_4v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_5v2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.1kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.2kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.3kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.4kananv2.yaml
+    - 50
+    - 1000

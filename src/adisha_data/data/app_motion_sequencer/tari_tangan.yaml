@@ -1,0 +1,61 @@
+val:
+  - - test_stand.yaml
+    - 0
+    - 100
+  - - Gerak1.yaml
+    - 0
+    - 800
+  - - Gerak2.yaml
+    - 0
+    - 500
+  - - Gerak3.yaml
+    - 0
+    - 500
+  - - Gerak4.yaml
+    - 0
+    - 500
+  - - Gerak5.yaml
+    - 0
+    - 500
+  - - Gerak6.yaml
+    - 0
+    - 800
+  - - Gerak1.yaml
+    - 0
+    - 800
+  - - Gerak2.yaml
+    - 0
+    - 500
+  - - Gerak3.yaml
+    - 0
+    - 500
+  - - Gerak4.yaml
+    - 0
+    - 500
+  - - Gerak5.yaml
+    - 0
+    - 500
+  - - Gerak6.yaml
+    - 0
+    - 800
+  - - Gerak1.yaml
+    - 0
+    - 800
+  - - Gerak2.yaml
+    - 0
+    - 500
+  - - Gerak3.yaml
+    - 0
+    - 500
+  - - Gerak4.yaml
+    - 0
+    - 500
+  - - Gerak5.yaml
+    - 0
+    - 500
+  - - Gerak6.yaml
+    - 0
+    - 800
+  - - test_stand.yaml
+    - 0
+    - 2000

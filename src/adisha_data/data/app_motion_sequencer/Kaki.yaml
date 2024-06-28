@@ -1,0 +1,16 @@
+val:
+  - - kaki_1.yaml
+    - 0
+    - 1000
+  - - kaki_2.yaml
+    - 0
+    - 1000
+  - - kaki_3.yaml
+    - 0
+    - 1000
+  - - kaki_4.yaml
+    - 0
+    - 1000
+  - - kaki_5.yaml
+    - 0
+    - 1000

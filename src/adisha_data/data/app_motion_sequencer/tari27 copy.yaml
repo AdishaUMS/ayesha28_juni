@@ -1,0 +1,373 @@
+val:
+  - - 1_baru.yaml
+    - 50
+    - 600
+  - - 2_baru.yaml
+    - 50
+    - 600
+  - - 3_baru.yaml
+    - 50
+    - 600
+  - - 4_baru.yaml
+    - 50
+    - 600
+  - - 5_baru.yaml
+    - 50
+    - 600
+  - - 7_baru.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_baru.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.1.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.2.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.3.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.4.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.5.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.6.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.7.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.8.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.9.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.10.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.11.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.12.yaml
+    - 50
+    - 1000
+  - - ngelingkas_1.13.yaml
+    - 50
+    - 1000
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_baru.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_naik.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_naik.yaml
+    - 50
+    - 600
+  - - 16_naik.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_baru.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_baru.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - awal1_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - awal2_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - awal3_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - mungkah_lawang_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kananv2_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - lukanagasataru_kanan_1v2.yaml
+    - 50
+    - 1000
+  - - lukanagasataru_kanan_2v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_3v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_4v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_5v2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.1kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.2kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.3kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.4kananv2.yaml
+    - 50
+    - 1000
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_baru.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_turun.yaml
+    - 50
+    - 600
+  - - 10_turun.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_turun.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600
+  - - 7_loop.yaml
+    - 50
+    - 900
+  - - 8_baru.yaml
+    - 50
+    - 600
+  - - 9_baru.yaml
+    - 50
+    - 600
+  - - 10_baru.yaml
+    - 50
+    - 600
+  - - 11_baru.yaml
+    - 50
+    - 600
+  - - 12_baru.yaml
+    - 50
+    - 600
+  - - 13_baru.yaml
+    - 50
+    - 900
+  - - 14_baru.yaml
+    - 50
+    - 600
+  - - 15_18.yaml
+    - 50
+    - 600
+  - - 16_baru.yaml
+    - 50
+    - 600
+  - - 17_baru.yaml
+    - 50
+    - 600

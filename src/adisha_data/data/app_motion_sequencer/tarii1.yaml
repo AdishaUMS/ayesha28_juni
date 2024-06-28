@@ -1,0 +1,52 @@
+val:
+  - - awal1_mungkah_lawangv2.yaml
+    - 0
+    - 1000
+  - - awal2_mungkah_lawangv2.yaml
+    - 50
+    - 1000
+  - - awal3_mungkah_lawangv2.yaml
+    - 500
+    - 1000
+  - - mungkah_lawang_baruv2.yaml
+    - 500
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 50
+    - 1000
+  - - agem_kananv2_baruv2.yaml
+    - 500
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 500
+    - 1000
+  - - lukanagasataru_kanan_1v2.yaml
+    - 500
+    - 1000
+  - - lukanagasataru_kanan_2v2.yaml
+    - 500
+    - 1000
+  - - lukaganasataru_kanan_3v2.yaml
+    - 50
+    - 1000
+  - - lukaganasataru_kanan_4v2.yaml
+    - 500
+    - 1000
+  - - lukaganasataru_kanan_5v2.yaml
+    - 50
+    - 1000
+  - - agem_kanan_baruv2.yaml
+    - 500
+    - 1000
+  - - gerak_piles_1.1kananv2.yaml
+    - 500
+    - 1000
+  - - gerak_piles_1.2kananv2.yaml
+    - 500
+    - 1000
+  - - gerak_piles_1.3kananv2.yaml
+    - 50
+    - 1000
+  - - gerak_piles_1.4kananv2.yaml
+    - 500
+    - 1000

@@ -1,5 +1,5 @@
-output_filename: 'tari_test.yaml'
-arm: 'tari1.yaml'
-leg: 'tari2.yaml'
+output_filename: tari27 copy.yaml
+arm: tari27 copy.yaml
+leg: tari27 copy.yaml
 dt_ms: 30
-q_prop: 0.75
+q_prop: 0.2
